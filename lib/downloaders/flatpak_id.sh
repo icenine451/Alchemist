@@ -19,7 +19,7 @@ download() {
 
   # Ensure flathub is added as a remote
   if ! flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo; then
-    echo "FlatHub could not be added as a remote"
+    log error "FlatHub could not be added as a remote"
     return 1
   fi
 
@@ -29,7 +29,7 @@ download() {
     final_dest="$FLATPAK_SYSTEM_ROOT"
     flatpak_install_mode="system"
   else
-    echo "Provided Flatpak destination invalid. Valid options are \"user\" or \"system\""
+    log error "Provided Flatpak destination invalid. Valid options are \"user\" or \"system\""
     return 1
   fi
 
@@ -37,24 +37,24 @@ download() {
     final_flatpak_id="$flatpak_id//$version"
   fi
 
-  echo "Downloading: $final_flatpak_id"
-  echo "Destination: $final_dest"
+  log info "Downloading: $final_flatpak_id"
+  log info "Destination: $final_dest"
 
   download_cmd() {
     flatpak install --"$flatpak_install_mode" -y --or-update --noninteractive flathub "$final_flatpak_id" 2>&1
   }
 
   if ! try "$max_retries" "$initial_delay" "$max_delay" download_cmd; then
-    echo "Download failed: $final_flatpak_id"
+    log error "Download failed: $final_flatpak_id"
     return 1
   fi
 
   # Verify local Flatpak install exists
   if [[ ! -d "$final_dest" ]]; then
-    echo "Flatpak not installed at desired destination: $final_dest"
+    log error "Flatpak not installed at desired destination: $final_dest"
     return 1
   fi
 
-  echo "Flatpak install completed successfully"
+  log info "Flatpak install completed successfully"
   return 0
 }
