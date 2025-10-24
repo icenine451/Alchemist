@@ -43,9 +43,8 @@ load_downloaders() {
     local info
     info=$(downloader_info)
 
-    local types description
+    local types
     types=$(echo "$info" | grep "^type:" | cut -d: -f2)
-    description=$(echo "$info" | grep "^description:" | cut -d: -f2-)
 
     if [[ ! -n "$types" ]]; then
       echo "Downloader $filename does not specify any types"
