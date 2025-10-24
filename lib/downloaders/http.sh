@@ -2,7 +2,6 @@
 
 downloader_info() {
   echo "type:http"
-  echo "description:Downloads files via HTTP/HTTPS"
 }
 
 download() {

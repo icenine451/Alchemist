@@ -13,7 +13,6 @@ source "$SCRIPT_DIR/defaults.sh"
 
 # Create dictionaries for downloader registry
 declare -A DOWNLOADER_TYPES
-declare -A DOWNLOADER_DESCRIPTIONS
 declare -A DOWNLOADER_FILES
 
 
@@ -60,8 +59,6 @@ load_downloaders() {
       DOWNLOADER_TYPES["$type"]="$filename"
       DOWNLOADER_FILES["$filename"]="$downloader_file"
     done
-
-    DOWNLOADER_DESCRIPTIONS["$filename"]="$description"
 
     echo "Loaded downloader: $filename (types: $types)"
   done

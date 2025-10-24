@@ -3,7 +3,6 @@
 # Describe this downloader's capabilities
 downloader_info() {
   echo "type:flatpak_id"
-  echo "description:Locally installs a given Flatpak ID from Flathub so files can be extracted"
 }
 
 download() {

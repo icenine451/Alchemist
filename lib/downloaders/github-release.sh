@@ -2,7 +2,6 @@
 
 downloader_info() {
   echo "type:github-release"
-  echo "description:Downloads files via resolved GitHub releases"
 }
 
 is_github_release_url() {
