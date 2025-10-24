@@ -135,8 +135,6 @@ download() {
   source "$SCRIPT_DIR/downloaders/$downloader_file"
   echo "Using downloader: $downloader_file"
 
-  if [[ ! -d "$dest" ]]; then
-
   if ! download "$url" "$dest" "$version" "$type" "$max_retries" "$initial_delay" "$max_delay"; then
     echo "Download failed"
     exit 1
