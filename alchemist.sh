@@ -14,7 +14,6 @@ source "$SCRIPT_DIR/lib/archive.sh"
 
 log() {
   echo "[$1] $2" >&2
-  echo "[$1] $2" >> "$DEFAULT_LOGFILE"
 }
 
 transmute() {
