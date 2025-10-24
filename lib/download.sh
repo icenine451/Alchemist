@@ -140,5 +140,5 @@ download() {
     exit 1
   fi
 
-  exit 0
+  return 0
 }
