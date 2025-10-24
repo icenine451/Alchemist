@@ -14,7 +14,8 @@ source "$SCRIPT_DIR/lib/archive.sh"
 
 transmute() {
   component_recipe_file=$(realpath "$1")
-  workdir=$(realpath -m "$2")
+  workdir="${2:-$DEFAULT_WORKDIR}"
+  workdir="$(realpath "$workdir")"
 
   # component_recipe.json file information extraction
   component_recipe_contents=$(jq -r '.' "$component_recipe_file")
