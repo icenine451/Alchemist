@@ -2,23 +2,19 @@
 
 set -euo pipefail
 
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 # Source shared libraries
-source "$SCRIPT_DIR/tools/download_retry.sh"
-source "$SCRIPT_DIR/tools/url_resolver.sh"
-source "$SCRIPT_DIR/tools/github_api.sh"
-source "$SCRIPT_DIR/defaults.sh"
+source "$SCRIPT_DIR/lib/tools/download_retry.sh"
+source "$SCRIPT_DIR/lib/tools/url_resolver.sh"
+source "$SCRIPT_DIR/lib/tools/github_api.sh"
 
 # Create dictionaries for downloader registry
 declare -A DOWNLOADER_TYPES
 declare -A DOWNLOADER_FILES
 
+# Set inherited downloaders module dir location
+downloader_dir="$SCRIPT_DIR/lib/downloaders"
 
 load_downloaders() {
-  local downloader_dir="$SCRIPT_DIR/downloaders"
-
   if [[ ! -d "$downloader_dir" ]]; then
     echo "Downloaders directory not found: $downloader_dir"
     return 1
@@ -116,7 +112,7 @@ parse_args() {
   fi
 }
 
-download() {
+download_stage() {
   load_downloaders
 
   parse_args "$@"
@@ -127,7 +123,7 @@ download() {
   fi
 
   local downloader_file="${DOWNLOADER_TYPES[$type]}" # Pull the appropriate downloader module from the dictionary
-  source "$SCRIPT_DIR/downloaders/$downloader_file"
+  source "$downloader_dir/$downloader_file"
   echo "Using downloader: $downloader_file"
 
   if ! download "$url" "$dest" "$version" "$type" "$max_retries" "$initial_delay" "$max_delay"; then
