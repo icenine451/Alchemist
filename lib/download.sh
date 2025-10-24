@@ -112,7 +112,7 @@ parse_args() {
   fi
 }
 
-download_stage() {
+process_download() {
   load_downloaders
 
   parse_args "$@"

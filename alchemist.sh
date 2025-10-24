@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source tooling scripts
 source "$SCRIPT_DIR/lib/defaults.sh"
-source "$SCRIPT_DIR/lib/logger.sh"
 source "$SCRIPT_DIR/lib/download.sh"
 source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
@@ -39,7 +38,7 @@ transmute() {
     source_url="$(jq -r '.source_url' <<< $source_obj)"
     source_version="$(jq -r '.version' <<< $source_obj)"
 
-    result=$(download_cli -t "$source_type" -u "$source_url" -d "$workdir" -v "$source_version")
+    result=$(process_download -t "$source_type" -u "$source_url" -d "$workdir" -v "$source_version")
     downloaded_file=$(echo "$result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
 
     source_extraction_type="$(jq -r '.extraction_type' <<< $source_obj)"
