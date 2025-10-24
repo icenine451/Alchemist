@@ -12,6 +12,11 @@ source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
 source "$SCRIPT_DIR/lib/archive.sh"
 
+log() {
+  echo "[$1] $2" >&2
+  echo "[$1] $2" >> "$DEFAULT_LOGFILE"
+}
+
 transmute() {
   component_recipe_file=$(realpath "$1")
   workdir="${2:-$DEFAULT_WORKDIR}"
@@ -25,7 +30,10 @@ transmute() {
   component_version="$(jq -r '.[].version' <<< $component_recipe_contents)"
   component_extraction_type="$(jq -r '.[].extraction_type' <<< $component_recipe_contents)"
 
-  mkdir -p "$workdir" # Initialize the work area
+  COMPONENT_ARTIFACT_ROOT="$workdir/$component_name-artifact" # Initialize the final destination for kept files
+  export "$COMPONENT_ARTIFACT_ROOT" # Export for use across all stages
+
+  mkdir -p "$COMPONENT_ARTIFACT_ROOT" # Initialize the work area
 
   download_cli -t "$component_source_type" -u "$component_source_url" -d "$workdir" -v "$component_version"
 
