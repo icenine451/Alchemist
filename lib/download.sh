@@ -13,7 +13,6 @@ source "$SCRIPT_DIR/defaults.sh"
 
 # Create dictionaries for downloader registry
 declare -A DOWNLOADER_TYPES
-declare -A DOWNLOADER_PROTOCOLS
 declare -A DOWNLOADER_DESCRIPTIONS
 declare -A DOWNLOADER_FILES
 
