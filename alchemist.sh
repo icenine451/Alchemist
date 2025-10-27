@@ -24,8 +24,12 @@ transmute() {
   component_recipe_contents=$(jq -r '.' "$component_recipe_file")
   component_name="$(jq -r '. | keys[]' <<< $component_recipe_contents)"
 
+  if [[ -d "$workdir" ]]; then # If a workdir already exists, clear it
+    rm -rf "$workdir"
+  fi
+
   COMPONENT_ARTIFACT_ROOT="$workdir/$component_name-artifact" # Initialize the final destination for kept files
-  export "$COMPONENT_ARTIFACT_ROOT" # Export for use across all stages
+  mkdir -p "$COMPONENT_ARTIFACT_ROOT"
 
   combined_sources_array=$(echo "$component_recipe_contents" | jq -c '
     .[] as $parent |
@@ -33,16 +37,25 @@ transmute() {
     map(del(.additional_sources))
   ')
 
-  echo "$combined_sources_array" | jq -c '.[]' | while read -r source_obj; do
+  while read -r source_obj; do
     source_type="$(jq -r '.source_type' <<< $source_obj)"
     source_url="$(jq -r '.source_url' <<< $source_obj)"
     source_version="$(jq -r '.version' <<< $source_obj)"
+    source_dest="$(jq -r '.dest//empty' <<< $source_obj)"
+    extraction_type="$(jq -r '.extraction_type' <<< $source_obj)"
 
-    result=$(process_download -t "$source_type" -u "$source_url" -d "$workdir" -v "$source_version")
-    downloaded_file=$(echo "$result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
+    if [[ ! -n "$source_dest" ]]; then
+      source_dest="$workdir"
+    fi
 
-    source_extraction_type="$(jq -r '.extraction_type' <<< $source_obj)"
-  done
+    # Download stage for this object
+    download_result=$(download_cli -t "$source_type" -u "$source_url" -d "$source_dest" -v "$source_version")
+    downloaded_file=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
+
+    # Extraction stage for this object
+    extraction_result=$(process_extract -f "$downloaded_file" -d "$source_dest" -t "$extraction_type")
+    extracted_path=$(echo "$extraction_result" | grep "^EXTRACTED_PATH=" | cut -d= -f2)
+  done < <(echo "$combined_sources_array" | jq -c '.[]')
 }
 
 transmute "$@"
