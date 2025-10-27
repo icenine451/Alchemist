@@ -13,6 +13,11 @@ download() {
   local final_file_path="$file_path"
   local final_dest="$dest"
 
+  if [[ ! -d "$dest" ]]; then
+    log error "Dest directory $dest does not exist, exiting..."
+    exit 1
+  fi
+
   # If supplied file name / path contains version placeholders
   if has_version_placeholder "$file_path"; then
     final_file_path=$(substitute_version "$file_path" "$version")

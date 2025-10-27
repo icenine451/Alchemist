@@ -21,6 +21,11 @@ download() {
   local resolved_version="$version"
   local final_url="$url"
 
+  if [[ ! -d "$dest" ]]; then
+    log error "Dest directory $dest does not exist, exiting..."
+    exit 1
+  fi
+
   if is_github_release_url "$url"; then # Validate URL is for a GitHub release
     log info "Processing GitHub release URL"
 

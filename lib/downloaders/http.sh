@@ -16,6 +16,11 @@ download() {
   local resolved_version="$version"
   local final_url="$url"
 
+  if [[ ! -d "$dest" ]]; then
+    log error "Dest directory $dest does not exist, exiting..."
+    exit 1
+  fi
+
   if has_version_placeholder "$url"; then # Substitute version placeholder if present
     final_url=$(substitute_version "$url" "$version")
   fi
