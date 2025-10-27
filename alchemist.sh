@@ -50,11 +50,25 @@ transmute() {
 
     # Download stage for this object
     download_result=$(process_download -t "$source_type" -u "$source_url" -d "$source_dest" -v "$source_version")
-    downloaded_file=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
+    DOWNLOADED_FILE=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
 
     # Extraction stage for this object
-    extraction_result=$(process_extract -f "$downloaded_file" -d "$source_dest" -t "$extraction_type")
-    extracted_path=$(echo "$extraction_result" | grep "^EXTRACTED_PATH=" | cut -d= -f2)
+    extraction_result=$(process_extract -f "$DOWNLOADED_FILE" -d "$source_dest" -t "$extraction_type")
+    EXTRACTED_PATH=$(echo "$extraction_result" | grep "^EXTRACTED_PATH=" | cut -d= -f2)
+
+    # Assemble stage for this object
+    all_assets="$(jq -r '.assets//empty' <<< $source_obj)"
+
+    if [[ -n "$all_assets" ]]; then
+      while read -r asset_obj; do
+        asset_type="$(jq -r '.type' <<< $asset_obj)"
+        asset_source="$(jq -r '.source' <<< $asset_obj)"
+        asset_dest="$(jq -r '.dest' <<< $asset_obj)"
+        asset_root="$EXTRACTED_PATH"
+
+        assembly_result=$(process_assemble -t "$asset_type" -s "$asset_source" -d "$asset_dest" -r "$asset_root")
+      done < <(echo "$all_assets" | jq -c '.[]')
+    fi
   done < <(echo "$combined_sources_array" | jq -c '.[]')
 }
 
