@@ -16,7 +16,7 @@ downloader_dir="$SCRIPT_DIR/lib/downloaders"
 
 load_downloaders() {
   if [[ ! -d "$downloader_dir" ]]; then
-    echo "Downloaders directory not found: $downloader_dir"
+    log error "Downloaders directory not found: $downloader_dir"
     return 1
   fi
 
@@ -31,7 +31,7 @@ load_downloaders() {
     source "$downloader_file"
 
     if ! declare -f downloader_info > /dev/null; then # Check if downloader_info function exists
-      echo "Downloader $filename does not implement downloader_info()"
+      log warn "Downloader $filename does not implement downloader_info()"
       continue
     fi
 
@@ -43,7 +43,7 @@ load_downloaders() {
     types=$(echo "$info" | grep "^type:" | cut -d: -f2)
 
     if [[ ! -n "$types" ]]; then
-      echo "Downloader $filename does not specify any types"
+      log warn "Downloader $filename does not specify any types"
       continue
     fi
 
@@ -55,7 +55,7 @@ load_downloaders() {
       DOWNLOADER_FILES["$filename"]="$downloader_file"
     done
 
-    echo "Loaded downloader: $filename (types: $types)"
+    log info "Loaded downloader: $filename (types: $types)"
   done
 }
 
@@ -107,7 +107,7 @@ parse_args() {
 
   # Validate required arguments
   if [[ ! -n "$type" || ! -n "$url" || ! -n "$dest" || ! -n "$version" ]]; then
-    echo "Missing required arguments"
+    log error "Missing required arguments"
     exit 1
   fi
 }
@@ -118,16 +118,16 @@ process_download() {
   parse_args "$@"
 
   if [[ ! -n "${DOWNLOADER_TYPES[$type]:-}" ]]; then # Find appropriate downloader for the specified type
-    echo "No downloader found for type: $type"
+    log error "No downloader found for type: $type"
     exit 1
   fi
 
   local downloader_file="${DOWNLOADER_TYPES[$type]}" # Pull the appropriate downloader module from the dictionary
   source "$downloader_dir/$downloader_file"
-  echo "Using downloader: $downloader_file"
+  log info "Using downloader: $downloader_file"
 
   if ! download "$url" "$dest" "$version" "$type" "$max_retries" "$initial_delay" "$max_delay"; then
-    echo "Download failed"
+    log error "Download failed"
     exit 1
   fi
 
