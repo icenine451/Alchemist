@@ -9,7 +9,7 @@ extract() {
   local dest="$2"
   local type="$3"
 
-  local final_dest="$dest"
+  local final_dest="$dest/$(basename $archive)-extracted"
 
   case "$type" in
     7z)
