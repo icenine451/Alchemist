@@ -15,7 +15,6 @@ download() {
   local max_delay="${7:-30}"
 
   local final_flatpak_id="$flatpak_id"
-  local flatpak_install_mode="user"
 
   # Ensure flathub is added as a remote
   if ! flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo; then
@@ -23,25 +22,26 @@ download() {
     return 1
   fi
 
-  if [[ "$dest" == "user" ]]; then
-    final_dest="$FLATPAK_USER_ROOT"
-  elif [[ "$dest" == "system" ]]; then
-    final_dest="$FLATPAK_SYSTEM_ROOT"
-    flatpak_install_mode="system"
-  else
-    log error "Provided Flatpak destination invalid. Valid options are \"user\" or \"system\""
-    return 1
-  fi
-
   if [[ ! "$version" == "latest" ]]; then # If a specific version was given, add it to the Flatpak ID
     final_flatpak_id="$flatpak_id//$version"
   fi
 
+  if [[ "$dest" == "user" ]]; then
+    final_dest="$FLATPAK_USER_ROOT/$final_flatpak_id"
+  elif [[ "$dest" == "system" ]]; then
+    final_dest="$FLATPAK_SYSTEM_ROOT/$final_flatpak_id"
+  else
+    log warn "Provided Flatpak destination invalid. Valid options are \"user\" or \"system\". Defaulting to \"$FLATPAK_DEFAULT_INSTALL_TYPE\" install type."
+    dest="$DEFAULT_INSTALL_TYPE"
+    final_dest="$FLATPAK_USER_ROOT/$final_flatpak_id"
+  fi
+
   log info "Downloading: $final_flatpak_id"
   log info "Destination: $final_dest"
+  log info "Flatpak Install Mode: $dest"
 
   download_cmd() {
-    flatpak install --"$flatpak_install_mode" -y --or-update --noninteractive flathub "$final_flatpak_id" 2>&1
+    flatpak install --"$dest" -y --or-update --noninteractive flathub "$final_flatpak_id" 2>&1
   }
 
   if ! try "$max_retries" "$initial_delay" "$max_delay" download_cmd; then
@@ -56,5 +56,6 @@ download() {
   fi
 
   log info "Flatpak install completed successfully"
+  echo "DOWNLOADED_FILE=$final_dest"
   return 0
 }
