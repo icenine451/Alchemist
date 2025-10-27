@@ -59,7 +59,7 @@ load_downloaders() {
   done
 }
 
-parse_args() {
+parse_download_args() {
   type=""
   url=""
   dest=""
@@ -115,7 +115,7 @@ parse_args() {
 process_download() {
   load_downloaders
 
-  parse_args "$@"
+  parse_download_args "$@"
 
   if [[ ! -n "${DOWNLOADER_TYPES[$type]:-}" ]]; then # Find appropriate downloader for the specified type
     log error "No downloader found for type: $type"

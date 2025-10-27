@@ -53,7 +53,7 @@ load_extractors() {
   done
 }
 
-parse_args() {
+parse_extract_args() {
   file=""
   dest=""
   type=""
@@ -89,7 +89,7 @@ parse_args() {
 process_extract() {
   load_extractors
 
-  parse_args "$@"
+  parse_extract_args "$@"
 
   if [[ ! -n "${EXTRACTOR_TYPES[$type]:-}" ]]; then # Find appropriate extractor for the specified type
     log error "No extractor found for type: $type"
