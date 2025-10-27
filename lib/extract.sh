@@ -86,7 +86,7 @@ parse_args() {
   fi
 }
 
-extract_stage() {
+process_extract() {
   load_extractors
 
   parse_args "$@"

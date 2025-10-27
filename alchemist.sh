@@ -49,7 +49,7 @@ transmute() {
     fi
 
     # Download stage for this object
-    download_result=$(download_cli -t "$source_type" -u "$source_url" -d "$source_dest" -v "$source_version")
+    download_result=$(process_download -t "$source_type" -u "$source_url" -d "$source_dest" -v "$source_version")
     downloaded_file=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
 
     # Extraction stage for this object
