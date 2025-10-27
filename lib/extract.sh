@@ -105,8 +105,5 @@ extract_stage() {
     exit 1
   fi
 
-  log info "Extraction successful, removing downloaded archive $file"
-  rm "$file"
-
   return 0
 }

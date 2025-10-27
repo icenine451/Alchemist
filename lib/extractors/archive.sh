@@ -48,5 +48,16 @@ extract() {
       ;;
   esac
 
-  extract_cmd "$archive" "$final_dest"
+  if ! extract_cmd "$archive" "$final_dest"; then
+    log error "Extraction of archive $archive could not be completed"
+    return 1
+  fi
+
+  # Clean up archive after extraction
+  log info "Extraction successful, removing downloaded archive $archive"
+  rm "$archive"
+
+  log info "Archive $archive extracted successfully"
+  echo "EXTRACTED_PATH=$final_dest"
+  return 0
 }
