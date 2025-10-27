@@ -14,11 +14,13 @@ extract() {
     return 1
   fi
 
-  local final_dest="$dest/squashfs-root"
+  local final_dest="$dest/$(basename $archive)-extracted/squashfs-root"
 
   extract_cmd() {
     chmod +x "$archive"
     cd "$dest" && "$archive" --appimage-extract
+    mkdir -p "$dest/$(basename $archive)-extracted"
+    mv "$dest/squashfs-root" "$final_dest"
   }
 
   extract_cmd "$archive"
