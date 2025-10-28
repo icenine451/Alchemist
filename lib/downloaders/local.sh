@@ -15,7 +15,7 @@ download() {
 
   if [[ ! -d "$dest" ]]; then
     log error "Dest directory $dest does not exist, exiting..."
-    exit 1
+    return 1
   fi
 
   # If supplied file name / path contains version placeholders

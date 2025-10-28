@@ -28,7 +28,7 @@ parse_assemble_args() {
         ;;
       *)
         log error "Unknown option: $1"
-        exit 1
+        return 1
         ;;
     esac
   done
@@ -36,7 +36,7 @@ parse_assemble_args() {
   # Validate required arguments
   if [[ ! -n "$type" || ! -n "$source" || ! -n "$dest" ]]; then
     log error "Missing required arguments"
-    exit 1
+    return 1
   fi
 
   if [[ ! -n "$root" ]]; then # If a root dir for the asset is not defined, assume the workdir
@@ -103,7 +103,7 @@ process_assemble() {
 
   if ! assemble "$type" "$source" "$dest" "$root"; then
     log error "Assembling asset failed"
-    exit 1
+    return 1
   fi
 
   return 0

@@ -100,7 +100,7 @@ parse_download_args() {
         ;;
       *)
         echo "Unknown option: $1"
-        exit 1
+        return 1
         ;;
     esac
   done
@@ -108,7 +108,7 @@ parse_download_args() {
   # Validate required arguments
   if [[ ! -n "$type" || ! -n "$url" || ! -n "$dest" || ! -n "$version" ]]; then
     log error "Missing required arguments"
-    exit 1
+    return 1
   fi
 }
 
@@ -119,7 +119,7 @@ process_download() {
 
   if [[ ! -n "${DOWNLOADER_TYPES[$type]:-}" ]]; then # Find appropriate downloader for the specified type
     log error "No downloader found for type: $type"
-    exit 1
+    return 1
   fi
 
   local downloader_file="${DOWNLOADER_TYPES[$type]}" # Pull the appropriate downloader module from the dictionary
@@ -128,7 +128,7 @@ process_download() {
 
   if ! download "$url" "$dest" "$version" "$type" "$max_retries" "$initial_delay" "$max_delay"; then
     log error "Download failed"
-    exit 1
+    return 1
   fi
 
   return 0

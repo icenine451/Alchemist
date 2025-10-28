@@ -74,7 +74,7 @@ parse_extract_args() {
         ;;
       *)
         log error "Unknown option: $1"
-        exit 1
+        return 1
         ;;
     esac
   done
@@ -82,7 +82,7 @@ parse_extract_args() {
   # Validate required arguments
   if [[ ! -n "$file" || ! -n "$dest" || ! -n "$type" ]]; then
     log error "Missing required arguments"
-    exit 1
+    return 1
   fi
 }
 
@@ -93,7 +93,7 @@ process_extract() {
 
   if [[ ! -n "${EXTRACTOR_TYPES[$type]:-}" ]]; then # Find appropriate extractor for the specified type
     log error "No extractor found for type: $type"
-    exit 1
+    return 1
   fi
 
   local extractor_file="${EXTRACTOR_TYPES[$type]}" # Pull the appropriate extractor module from the dictionary
@@ -102,7 +102,7 @@ process_extract() {
 
   if ! extract "$file" "$dest" "$type"; then
     log error "Extraction failed"
-    exit 1
+    return 1
   fi
 
   return 0
