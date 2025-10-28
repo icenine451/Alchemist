@@ -12,6 +12,10 @@ install_flatpak() {
     return 1
   fi
 
+  if [[ -n "$flatpak_version" ]]; then # If a specific version was given, add it to the Flatpak ID
+    final_flatpak_id="$flatpak_id//$flatpak_version"
+  fi
+
   if ! flatpak install --"$flatpak_install_mode" -y --or-update --noninteractive flathub "$final_flatpak_id" 2>&1; then
     log error "Flatpak $flatpak_id could not be installed."
     return 1
