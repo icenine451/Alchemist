@@ -12,7 +12,7 @@ install_flatpak() {
     return 1
   fi
 
-  if ! flatpak install --"$dest" -y --or-update --noninteractive flathub "$final_flatpak_id" 2>&1; then
+  if ! flatpak install --"$flatpak_install_mode" -y --or-update --noninteractive flathub "$final_flatpak_id" 2>&1; then
     log error "Flatpak $flatpak_id could not be installed."
     return 1
   fi
