@@ -6,10 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source tooling scripts
 source "$SCRIPT_DIR/lib/defaults.sh"
+source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
 source "$SCRIPT_DIR/lib/download.sh"
 source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
-source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
+source "$SCRIPT_DIR/lib/gather_lib.sh"
 source "$SCRIPT_DIR/lib/archive.sh"
 
 log() {
@@ -58,9 +59,9 @@ transmute() {
     EXTRACTED_PATH=$(echo "$extraction_result" | grep "^EXTRACTED_PATH=" | cut -d= -f2)
 
     # Assemble stage for this object
-    all_assets="$(jq -r '.assets//empty' <<< $source_obj)"
+    obj_assets="$(jq -r '.assets//empty' <<< $source_obj)"
 
-    if [[ -n "$all_assets" ]]; then
+    if [[ -n "$obj_assets" ]]; then
       while read -r asset_obj; do
         asset_type="$(jq -r '.type' <<< $asset_obj)"
         asset_source="$(jq -r '.source' <<< $asset_obj)"
@@ -68,7 +69,25 @@ transmute() {
         asset_root="$EXTRACTED_PATH"
 
         assembly_result=$(process_assemble -t "$asset_type" -s "$asset_source" -d "$asset_dest" -r "$asset_root")
-      done < <(echo "$all_assets" | jq -c '.[]')
+      done < <(echo "$obj_assets" | jq -c '.[]')
+    fi
+    
+    # Library gathering stage
+    obj_libs=$(echo "$source_obj" | jq -c '.libs//empty')
+
+    if [[ -n "$component_libs" ]]; then
+      log info "Component has listed libs, collecting..."
+
+      while read -r lib_obj; do
+        lib_name="$(jq -r '.library//empty' <<< $lib_obj)"
+        lib_runtime_name="$(jq -r '.runtime_name//empty' <<< $lib_obj)"
+        lib_runtime_version="$(jq -r '.runtime_version//empty'<<< $lib_obj)"
+        lib_source="$(jq -r '.source//empty' <<< $lib_obj)"
+        lib_dest="$(jq -r '.dest//empty' <<< $lib_obj)"
+        lib_source_root="$EXTRACTED_PATH"
+
+        gather_lib_result=$(process_gather_lib -n "$lib_name" -d "$lib_dest" -rn "$lib_runtime_name" -rv "$lib_runtime_version" -s "$lib_source" -r "$lib_source_root")
+      done < <(echo "$obj_libs" | jq -c '.[]')
     fi
   done < <(echo "$combined_sources_array" | jq -c '.[]')
 }
