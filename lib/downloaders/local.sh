@@ -24,7 +24,7 @@ download() {
   fi
 
   if [[ ! "$final_file_path" = /* ]]; then # If provided source path is relative
-    final_file_path="$workdir/$final_file_path"
+    final_file_path="WORKDIR/$final_file_path"
   fi
 
   if [[ -d "$dest" ]]; then # If the provided dest is a directory

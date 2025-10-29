@@ -40,7 +40,7 @@ parse_assemble_args() {
   fi
 
   if [[ ! -n "$root" ]]; then # If a root dir for the asset is not defined, assume the workdir
-    root="$workdir"
+    root="WORKDIR"
   fi
 }
 
