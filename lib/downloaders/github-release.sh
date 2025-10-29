@@ -22,8 +22,8 @@ download() {
   local final_url="$url"
 
   if [[ ! -d "$dest" ]]; then
-    log error "Dest directory $dest does not exist, exiting..."
-    return 1
+    log info "Dest directory $dest does not exist, creating..."
+    mkdir -p "$dest"
   fi
 
   if is_github_release_url "$url"; then # Validate URL is for a GitHub release
