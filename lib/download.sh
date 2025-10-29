@@ -2,10 +2,11 @@
 
 set -euo pipefail
 
-# Source shared libraries
+# Source tooling libraries
 source "$SCRIPT_DIR/lib/tools/download_retry.sh"
 source "$SCRIPT_DIR/lib/tools/url_resolver.sh"
 source "$SCRIPT_DIR/lib/tools/github_api.sh"
+source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
 
 # Create dictionaries for downloader registry
 declare -A DOWNLOADER_TYPES

@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Source tooling libraries
+source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
+
 # Create dictionaries for extractor registry
 declare -A EXTRACTOR_TYPES
 declare -A EXTRACTOR_FILES

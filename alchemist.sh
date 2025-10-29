@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source tooling scripts
 source "$SCRIPT_DIR/lib/defaults.sh"
-source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
 source "$SCRIPT_DIR/lib/download.sh"
 source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
