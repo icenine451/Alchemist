@@ -8,19 +8,29 @@ handle_extras() {
   local type="$1"
   local source="$2"
   local dest="$3"
-  local location="$4"
 
-  log info "Creating symlink $dest -> $source at location $location"
+  local final_source="$source"
+
+  if [[ ! "$final_source" = /* ]]; then # If provided source path is relative
+    final_dest="$COMPONENT_ARTIFACT_ROOT/$final_source"
+  fi
+
+  log info "Creating symlink $final_source -> $dest"
 
   process_extras_cmd() {
-    cd "$3" && ln -s "$1" "$2"
+    ln -s "$1" "$2"
   }
 
-  if ! process_extras_cmd "$dest" "$source" "$location"; then
-    log error "Symlink $dest -> $source at location $location could not be created"
+  if ! process_extras_cmd "$dest" "$final_source"; then
+    log error "Symlink $final_source -> $dest could not be created"
     return 1
   fi
 
-  log info "Symlink $dest -> $source at location $location created"
+  if [[ ! -L "$final_source" ]]; then
+    log error "Symlink $final_source -> $dest could not be validated"
+    return 1
+  fi
+
+  log info "Symlink $final_source -> $dest created"
   return 0
 }
