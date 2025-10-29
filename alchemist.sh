@@ -3,6 +3,7 @@
 # The purpose of this script is the take an input component.json file, aquire the original package, extract it to a useable file structure, pick out the files/folders desired and re-archive it in a standard structure.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 # Source tooling scripts
 source "$SCRIPT_DIR/lib/defaults.sh"
