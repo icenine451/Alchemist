@@ -10,7 +10,8 @@ source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
 source "$SCRIPT_DIR/lib/download.sh"
 source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
-source "$SCRIPT_DIR/lib/gather_lib.sh"
+source "$SCRIPT_DIR/lib/libs.sh"
+source "$SCRIPT_DIR/lib/extras.sh"
 source "$SCRIPT_DIR/lib/archive.sh"
 
 log() {
@@ -90,6 +91,21 @@ transmute() {
 
         gather_lib_result=$(process_gather_lib -n "$lib_name" -d "$lib_dest" -rn "$lib_runtime_name" -rv "$lib_runtime_version" -s "$lib_source" -r "$lib_source_root")
       done < <(echo "$obj_libs" | jq -c '.[]')
+    fi
+
+    # Extras gathering stage
+    component_extras=$(echo "$source_obj" | jq -c '.extras//empty')
+
+    if [[ -n "$component_extras" ]]; then
+      log info "Component has listed extras, gathering..."
+      while read -r extra_obj; do
+        extra_type="$(jq -r '.type//empty' <<< $extra_obj)"
+        extra_source="$(jq -r '.source//empty' <<< $extra_obj)"
+        extra_dest="$(jq -r '.dest//empty' <<< $extra_obj)"
+        extra_location="$(jq -r '.location//empty' <<< $extra_obj)"
+
+        handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -l "$extra_location")
+      done < <(echo "$component_extras" | jq -c '.[]')
     fi
   done < <(echo "$combined_sources_array" | jq -c '.[]')
 }
