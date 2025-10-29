@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Source tooling libraries
+source "$SCRIPT_DIR/lib/tools/install_flatpak.sh"
+
 parse_gather_lib_args() {
   name=""
   dest=""
@@ -68,7 +71,7 @@ gather_lib() {
       log info "Library $name already exists at $final_dest, skipping..."
       return 0
     fi
-    if ! install_flatpak "$runtime_name" "$runtime_version" "$FLATPAK_DEFAULT_INSTALL_MODE"; then # Attempt to install the source runtime
+    if ! install_flatpak "$runtime_name" "$runtime_version" "$FLATPAK_DEFAULT_INSTALL_MODE" "runtime"; then # Attempt to install the source runtime
       log error "Library source runtime $runtime_name could not be installed."
       return 1
     fi
