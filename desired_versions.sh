@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export RUFFLE_DESIRED_VERSION="9555d8fc3d5e5b3c9e9ccea40492277fefb950368f2f2a40a16b69ad42ea3e33"
