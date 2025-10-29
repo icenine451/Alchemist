@@ -21,6 +21,14 @@ transmute() {
   component_recipe_file=$(realpath "$1")
   WORKDIR="${2:-$DEFAULT_WORKDIR}"
   export WORKDIR="$(realpath "WORKDIR")"
+  desired_versions="${3:-$DESIRED_VERSIONS}"
+
+  if [[ ! -e "$desired_versions" ]]; then
+    echo "Desired version file could not be found at $desired_versions, cannot continue."
+    exit 1
+  fi
+
+  source "$desired_versions"
 
   # component_recipe.json file information extraction
   component_recipe_contents=$(jq -r '.' "$component_recipe_file")
