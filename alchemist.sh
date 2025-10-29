@@ -110,9 +110,9 @@ transmute() {
         extra_type="$(jq -r '.type//empty' <<< $extra_obj)"
         extra_source="$(jq -r '.source//empty' <<< $extra_obj)"
         extra_dest="$(jq -r '.dest//empty' <<< $extra_obj)"
-        extra_location="$(jq -r '.location//empty' <<< $extra_obj)"
+        extra_contents="$(jq -r '.contents//empty' <<< $extra_obj)"
 
-        handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -l "$extra_location")
+        handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -l "$extra_contents")
       done < <(echo "$component_extras" | jq -c '.[]')
     fi
   done < <(echo "$combined_sources_array" | jq -c '.[]')

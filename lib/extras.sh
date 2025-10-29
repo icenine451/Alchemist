@@ -60,7 +60,7 @@ parse_handle_extras_args() {
   type=""
   source=""
   dest=""
-  location=""
+  contents=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -76,8 +76,8 @@ parse_handle_extras_args() {
         dest="$2"
         shift 2
         ;;
-      -l|--location)
-        location="$2"
+      -c|--contents)
+        contents="$2"
         shift 2
         ;;
       *)
@@ -109,7 +109,7 @@ process_handle_extras() {
   source "$SCRIPT_DIR/lib/extras_handlers/$extras_handler_file"
   log info "Using extras handler: $extras_handler_file"
 
-  if ! handle_extras "$type" "$source" "$dest" "$location"; then
+  if ! handle_extras "$type" "$source" "$dest" "$contents"; then
     log error "Gathering extra files failed"
     return 1
   fi

@@ -8,7 +8,7 @@ handle_extras() {
   local type="$1"
   local source="$2"
   local dest="$3"
-  local location="$4"
+  local contents="$4"
 
   local final_dest="$dest"
 
@@ -18,11 +18,17 @@ handle_extras() {
 
   log info "Creating file $final_dest"
 
-  process_extras_cmd() {
-    touch "$1"
-  }
+  if [[ -n "$contents" ]]; then
+    process_extras_cmd() {
+      echo "$2" > "$1"
+    }
+  else
+    process_extras_cmd() {
+      touch "$1"
+    }
+  fi
 
-  if ! process_extras_cmd "$final_dest"; then
+  if ! process_extras_cmd "$final_dest" "$contents"; then
     log error "File $final_dest could not be created"
     return 1
   fi

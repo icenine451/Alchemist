@@ -8,7 +8,6 @@ handle_extras() {
   local type="$1"
   local source="$2"
   local dest="$3"
-  local location="$4"
 
   local final_source="$source"
   local final_dest="$dest"
