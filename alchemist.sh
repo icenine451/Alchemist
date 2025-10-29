@@ -32,13 +32,13 @@ transmute() {
 
   # component_recipe.json file information extraction
   component_recipe_contents=$(jq -r '.' "$component_recipe_file")
-  component_name="$(jq -r '. | keys[]' <<< $component_recipe_contents)"
+  export COMPONENT_NAME="$(jq -r '. | keys[]' <<< $component_recipe_contents)"
 
   if [[ -d "$WORKDIR" ]]; then # If a workdir already exists, clear it
     rm -rf "$WORKDIR"
   fi
 
-  export COMPONENT_ARTIFACT_ROOT="$WORKDIR/$component_name-artifact" # Initialize the final destination for kept files
+  export COMPONENT_ARTIFACT_ROOT="$WORKDIR/$COMPONENT_NAME-artifact" # Initialize the final destination for kept files
   mkdir -p "$COMPONENT_ARTIFACT_ROOT"
 
   component_recipe_contents=$(echo "$component_recipe_contents" | envsubst) # Process placeholder variables in component recipe
