@@ -20,7 +20,7 @@ log() {
 transmute() {
   component_recipe_file=$(realpath "$1")
   WORKDIR="${2:-$DEFAULT_WORKDIR}"
-  export WORKDIR="$(realpath "WORKDIR")"
+  export WORKDIR="$(realpath "$WORKDIR")"
   desired_versions="${3:-$DESIRED_VERSIONS}"
 
   if [[ ! -e "$desired_versions" ]]; then
@@ -34,11 +34,11 @@ transmute() {
   component_recipe_contents=$(jq -r '.' "$component_recipe_file")
   component_name="$(jq -r '. | keys[]' <<< $component_recipe_contents)"
 
-  if [[ -d "WORKDIR" ]]; then # If a workdir already exists, clear it
-    rm -rf "WORKDIR"
+  if [[ -d "$WORKDIR" ]]; then # If a workdir already exists, clear it
+    rm -rf "$WORKDIR"
   fi
 
-  export COMPONENT_ARTIFACT_ROOT="WORKDIR/$component_name-artifact" # Initialize the final destination for kept files
+  export COMPONENT_ARTIFACT_ROOT="$WORKDIR/$component_name-artifact" # Initialize the final destination for kept files
   mkdir -p "$COMPONENT_ARTIFACT_ROOT"
 
   component_recipe_contents=$(echo "$component_recipe_contents" | envsubst) # Process placeholder variables in component recipe
@@ -57,7 +57,7 @@ transmute() {
     extraction_type="$(jq -r '.extraction_type' <<< $source_obj)"
 
     if [[ ! -n "$source_dest" ]]; then
-      source_dest="WORKDIR"
+      source_dest="$WORKDIR"
     fi
 
     # Download stage for this object

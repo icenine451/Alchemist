@@ -14,7 +14,7 @@ handle_extras() {
   local final_dest="$dest"
 
   if [[ ! "$final_source" = /* ]]; then # If provided source path is relative
-    final_source="$workdir/$source"
+    final_source="$WORKDIR/$source"
   fi
 
   if [[ ! "$final_dest" = /* ]]; then # If provided dest path is relative
