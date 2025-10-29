@@ -27,21 +27,25 @@ extract() {
       ;;
     tar.gz|tgz)
       extract_cmd() {
+        mkdir -p "$2"
         tar -xzf "$1" -C "$2"
       }
       ;;
     tar.bz2|tbz2)
       extract_cmd() {
+        mkdir -p "$2"
         tar -xjf "$1" -C "$2"
       }
       ;;
     tar.xz|txz)
       extract_cmd() {
+        mkdir -p "$2"
         tar -xJf "$1" -C "$2"
       }
       ;;
     tar)
       extract_cmd() {
+        mkdir -p "$2"
         tar -xf "$1" -C "$2"
       }
       ;;
