@@ -457,6 +457,8 @@ Valid Key Value Reference:
 .<root key>.libs.[{<lib obj>.runtime_version}]
   This is an optional key containing the version of the Flatpak runtime that the library should be gathered from.
   If this key is provided, the 'runtime_name' key is also required and the 'source' key becomes unnecessary.
+  The value of this key can also be the placeholder '$DESIRED_QT6_RUNTIME_VERSION' for components that use Qt 6 or '$DESIRED_QT5_RUNTIME_VERSION' for components that use Qt 5, if a specific version is not needed.
+  These placeholders will be filled in with information from the 'desired_versions.sh' file.
 
 .<root key>.libs.[{<lib obj>.source}]
   This is an optional key containing the relative path used to gather this library file.
