@@ -63,11 +63,11 @@ transmute() {
 
     # Download stage for this object
     download_result=$(process_download -t "$source_type" -u "$source_url" -d "$source_dest" -v "$source_version")
-    DOWNLOADED_FILE=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
+    export DOWNLOADED_FILE=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
 
     # Extraction stage for this object
     extraction_result=$(process_extract -f "$DOWNLOADED_FILE" -d "$source_dest" -t "$extraction_type")
-    EXTRACTED_PATH=$(echo "$extraction_result" | grep "^EXTRACTED_PATH=" | cut -d= -f2)
+    export EXTRACTED_PATH=$(echo "$extraction_result" | grep "^EXTRACTED_PATH=" | cut -d= -f2)
 
     # Assemble stage for this object
     obj_assets="$(jq -r '.assets//empty' <<< $source_obj)"
