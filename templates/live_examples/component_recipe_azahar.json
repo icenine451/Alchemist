@@ -58,7 +58,7 @@
     "extras": [
       {
         "type": "dir",
-        "source": "$REPO_ROOT/$component_name",
+        "source": "$REPO_ROOT/$COMPONENT_NAME",
         "dest": "$COMPONENT_ARTIFACT_ROOT"
       }
     ]
