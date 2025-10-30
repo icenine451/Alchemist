@@ -12,7 +12,7 @@ handle_extras() {
   local final_source="$source"
 
   if [[ ! "$final_source" = /* ]]; then # If provided source path is relative
-    final_dest="$COMPONENT_ARTIFACT_ROOT/$final_source"
+    final_source="$COMPONENT_ARTIFACT_ROOT/$final_source"
   fi
 
   log info "Creating symlink $final_source -> $dest"
