@@ -39,7 +39,7 @@ handle_extras() {
     ;;
   esac
 
-  log info "Copying source: $final_url"
+  log info "Copying source: $final_source"
   log info "Copying destination: $final_dest"
 
   if ! process_extras_cmd "$final_source" "$final_dest"; then
