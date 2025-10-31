@@ -66,5 +66,6 @@ download() {
   fi
 
   log info "Download completed successfully"
+  echo "DOWNLOADED_FILE=$final_dest"
   return 0
 }
