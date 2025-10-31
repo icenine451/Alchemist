@@ -400,7 +400,11 @@ Valid Key Value Reference:
                      A value of 'latest' is also supported, which will use the GitHub API to determine the current latest release.
                      NOTE: USE OF THE 'latest' VALUE IS NOT RECOMMENDED AS THE VERSION DOWNLOADED IS UNCONTROLLED.
     - 'git' : Specific git commit hash to download and checkout.
+              A value of 'latest' is also supported, which will clone the latest commit of the repo.
+              NOTE: USE OF THE 'latest' VALUE IS NOT RECOMMENDED AS THE VERSION DOWNLOADED IS UNCONTROLLED.
     - 'flatpak-id' : Specific flatpak commit hash to download.
+                     A value of 'latest' is also supported, which will install the latest version of the flatpak.
+                     NOTE: USE OF THE 'latest' VALUE IS NOT RECOMMENDED AS THE VERSION DOWNLOADED IS UNCONTROLLED.
                      NOTE: Flatpak commit hash information can be found using the command 'flatpak remote-info --log flathub <flatpak ID>'
     - 'local' : For a 'local' source type, the key can be omitted entirely.
 
