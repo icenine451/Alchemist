@@ -75,7 +75,17 @@ gather_lib() {
       log error "Library source runtime $runtime_name could not be installed."
       return 1
     fi
-    local flatpak_root_to_search="$FLATPAK_USER_ROOT/runtime/$runtime_name/x86_64/$runtime_version/active/files" # Set base runtime path to search
+    
+    if [[ "$FLATPAK_DEFAULT_INSTALL_MODE" == "user" ]]; then
+      local flatpak_current_root="$FLATPAK_USER_ROOT"
+    elif [[ "$FLATPAK_DEFAULT_INSTALL_MODE" == "system" ]]; then
+      local flatpak_current_root="$$FLATPAK_SYSTEM_ROOT"
+    else
+      log error "Default Flatpak install mode is not defined."
+      return 1
+    fi
+
+    local flatpak_root_to_search="$flatpak_current_root/runtime/$runtime_name/x86_64/$runtime_version/active/files" # Set base runtime path to search
 
     local flatpak_found_libs=($(find "$flatpak_root_to_search" -name "$name")) # Search for libs with this exact name in the runtime
     if [[ ${#flatpak_found_libs[@]} -gt 1 ]]; then
