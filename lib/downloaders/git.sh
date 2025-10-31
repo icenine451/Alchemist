@@ -29,7 +29,7 @@ download() {
 
   download_cmd() {
     git clone --depth 1 "$1" "$2"
-    if [[ -n "$3" ]]; then
+    if [[ -n "$3" && ! "$3" == "latest" ]]; then
       cd $(basename "$2")
       git fetch --depth 1 origin "$3"
       git checkout "$3"
