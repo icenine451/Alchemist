@@ -1,6 +1,14 @@
 #!/bin/bash
 
 # The purpose of this script is the take an input component.json file, aquire the original package, extract it to a useable file structure, pick out the files/folders desired and re-archive it in a standard structure.
+# The script requires a recipe file to read, and optionally can be given an output directory (which overrides the default $WORKDIR) and an alternative 'desired_versions.sh' file.
+# ARGS:
+# Required: -f <recipe file>
+# Optional: -o [output directory]
+# Optional: -v [desired versions file]
+# USAGE: 
+# alchemist.sh -f component_recipe.json [-o <dir>] [-v <version file>]
+
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
@@ -86,7 +94,7 @@ transmute() {
     # Library gathering stage
     obj_libs=$(echo "$source_obj" | jq -c '.libs//empty')
 
-    if [[ -n "$component_libs" ]]; then
+    if [[ -n "$obj_libs" ]]; then
       log info "Component has listed libs, collecting..."
 
       while read -r lib_obj; do
@@ -112,10 +120,45 @@ transmute() {
         extra_dest="$(jq -r '.dest//empty' <<< $extra_obj)"
         extra_contents="$(jq -r '.contents//empty' <<< $extra_obj)"
 
-        handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -l "$extra_contents")
+        handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -c "$extra_contents")
       done < <(echo "$component_extras" | jq -c '.[]')
     fi
   done < <(echo "$combined_sources_array" | jq -c '.[]')
 }
 
-transmute "$@"
+parse_args() {
+  local recipe=""
+  local alt_workdir=""
+  local alt_versions=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--file)
+        recipe="$2"
+        shift 2
+        ;;
+      -o|--output)
+        alt_workdir="$2"
+        shift 2
+        ;;
+      -v|--versions)
+        alt_versions="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option: $1"
+        return 1
+        ;;
+    esac
+  done
+
+  # Validate required arguments
+  if [[ ! -n "$recipe" ]]; then
+    log error "Missing required arguments: -f <recipe file>"
+    return 1
+  fi
+
+  transmute "$recipe" "$alt_workdir" "$alt_versions"
+}
+
+parse_args "$@"
