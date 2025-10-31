@@ -6,7 +6,7 @@ install_flatpak() {
   local flatpak_install_mode="$3"
   local flatpak_source_type="$4"
 
-  if ! flatpak remote-add --if-not-exists flathub "$FLATHUB_REPO"; then # Ensure flathub is added as a remote
+  if ! flatpak remote-add --$flatpak_install_mode --if-not-exists flathub "$FLATHUB_REPO"; then # Ensure flathub is added as a remote
     log error "FlatHub could not be added as a remote"
     return 1
   fi
