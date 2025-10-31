@@ -532,10 +532,10 @@ $EXTRACTED_PATH
   In the case of a "local" extraction (which does not involve any actually compressed files, such as for local or flatpak sources), a dummy plugin is used to return the same path as was provided by the downloader.
 
 $FLATPAK_USER_ROOT
-  This is a default value to denote the path to the "user" install location for Flatpaks (typically '$HOME/.local/share/flatpak/app'). This value is defined in the defaults.sh file and can be adjusted to as needed depending on the environment.
+  This is a default value to denote the path to the "user" install location for Flatpaks (typically '$HOME/.local/share/flatpak'). This value is defined in the defaults.sh file and can be adjusted to as needed depending on the environment.
 
 $FLATPAK_SYSTEM_ROOT
-  This is a default value to denote the path to the "system" install location for Flatpaks (typically '/var/lib/flatpak/app'). This value is defined in the defaults.sh file and can be adjusted to as needed depending on the environment.
+  This is a default value to denote the path to the "system" install location for Flatpaks (typically '/var/lib/flatpak'). This value is defined in the defaults.sh file and can be adjusted to as needed depending on the environment.
 
 $FLATPAK_DEFAULT_INSTALL_MODE
   This sets the default install "mode" used for local Flatpak installed. It defaults to 'user' as 'system' mode installs may require sudo depending on the environment.
