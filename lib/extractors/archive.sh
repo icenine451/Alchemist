@@ -11,46 +11,45 @@ extract() {
 
   local final_dest="$dest/$(basename $archive)-extracted"
 
-  local file_ext="$(basename $archive)"
-  file_ext="${file_ext##*.}"
+  local filename="$(basename $archive)"
 
-  case "$file_ext" in
-    7z)
+  case "$filename" in
+    *.7z)
       extract_cmd() {
         7z x "$1" -o"$2"
       }
       ;;
-    zip)
+    *.zip)
       extract_cmd() {
         unzip -q "$1" -d "$2"
       }
       ;;
-    tar.gz|tgz)
+    *.tar.gz|*.tgz)
       extract_cmd() {
         mkdir -p "$2"
         tar -xzf "$1" -C "$2"
       }
       ;;
-    tar.bz2|tbz2)
+    *.tar.bz2|*.tbz2)
       extract_cmd() {
         mkdir -p "$2"
         tar -xjf "$1" -C "$2"
       }
       ;;
-    tar.xz|txz)
+    *.tar.xz|*.txz)
       extract_cmd() {
         mkdir -p "$2"
         tar -xJf "$1" -C "$2"
       }
       ;;
-    tar)
+    *.tar)
       extract_cmd() {
         mkdir -p "$2"
         tar -xf "$1" -C "$2"
       }
       ;;
     *)
-      log error "Error: Unsupported archive type: $type"
+      log error "Error: Unsupported archive type: $filename"
       return 1
       ;;
   esac
