@@ -29,7 +29,7 @@ download() {
 
   if [[ -d "$dest" ]]; then # If the provided dest is a directory
     log info "Destination $dest is a directory, constructing full destination path..."
-    final_dest="$dest/$(basename $file_path)"
+    final_dest="$dest/$(basename $final_file_path)"
   fi
 
   if [[ ! -f "$final_file_path" ]]; then
