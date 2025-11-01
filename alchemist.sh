@@ -32,6 +32,8 @@ transmute() {
   export WORKDIR="$(realpath "$WORKDIR")"
   desired_versions="${3:-$DESIRED_VERSIONS}"
 
+  export EXTRACTED_PATH=""
+
   if [[ ! -e "$desired_versions" ]]; then
     echo "Desired version file could not be found at $desired_versions, cannot continue."
     exit 1
@@ -50,8 +52,6 @@ transmute() {
   export COMPONENT_ARTIFACT_ROOT="$WORKDIR/$COMPONENT_NAME-artifact" # Initialize the final destination for kept files
   mkdir -p "$COMPONENT_ARTIFACT_ROOT"
 
-  component_recipe_contents=$(echo "$component_recipe_contents" | envsubst) # Process placeholder variables in component recipe
-
   combined_sources_array=$(echo "$component_recipe_contents" | jq -c '
     .[] as $parent |
     ([$parent] + ($parent.additional_sources // [])) |
@@ -60,9 +60,9 @@ transmute() {
 
   while read -r source_obj; do
     source_type="$(jq -r '.source_type' <<< $source_obj)"
-    source_url="$(jq -r '.source_url' <<< $source_obj)"
-    source_version="$(jq -r '.version' <<< $source_obj)"
-    source_dest="$(jq -r '.dest//empty' <<< $source_obj)"
+    source_url="$(jq -r '.source_url' <<< $source_obj | envsubst)"
+    source_version="$(jq -r '.version' <<< $source_obj | envsubst)"
+    source_dest="$(jq -r '.dest//empty' <<< $source_obj | envsubst)"
     extraction_type="$(jq -r '.extraction_type' <<< $source_obj)"
 
     if [[ ! -n "$source_dest" ]]; then
@@ -83,8 +83,8 @@ transmute() {
     if [[ -n "$obj_assets" ]]; then
       while read -r asset_obj; do
         asset_type="$(jq -r '.type' <<< $asset_obj)"
-        asset_source="$(jq -r '.source' <<< $asset_obj)"
-        asset_dest="$(jq -r '.dest' <<< $asset_obj)"
+        asset_source="$(jq -r '.source' <<< $asset_obj | envsubst)"
+        asset_dest="$(jq -r '.dest' <<< $asset_obj | envsubst)"
         asset_root="$EXTRACTED_PATH"
 
         assembly_result=$(process_assemble -t "$asset_type" -s "$asset_source" -d "$asset_dest" -r "$asset_root")
@@ -100,9 +100,9 @@ transmute() {
       while read -r lib_obj; do
         lib_name="$(jq -r '.library//empty' <<< $lib_obj)"
         lib_runtime_name="$(jq -r '.runtime_name//empty' <<< $lib_obj)"
-        lib_runtime_version="$(jq -r '.runtime_version//empty'<<< $lib_obj)"
-        lib_source="$(jq -r '.source//empty' <<< $lib_obj)"
-        lib_dest="$(jq -r '.dest//empty' <<< $lib_obj)"
+        lib_runtime_version="$(jq -r '.runtime_version//empty'<<< $lib_obj | envsubst)"
+        lib_source="$(jq -r '.source//empty' <<< $lib_obj | envsubst)"
+        lib_dest="$(jq -r '.dest//empty' <<< $lib_obj | envsubst)"
         lib_source_root="$EXTRACTED_PATH"
 
         gather_lib_result=$(process_gather_lib -n "$lib_name" -d "$lib_dest" -rn "$lib_runtime_name" -rv "$lib_runtime_version" -s "$lib_source" -r "$lib_source_root")
@@ -116,9 +116,9 @@ transmute() {
       log info "Component has listed extras, gathering..."
       while read -r extra_obj; do
         extra_type="$(jq -r '.type//empty' <<< $extra_obj)"
-        extra_source="$(jq -r '.source//empty' <<< $extra_obj)"
-        extra_dest="$(jq -r '.dest//empty' <<< $extra_obj)"
-        extra_contents="$(jq -r '.contents//empty' <<< $extra_obj)"
+        extra_source="$(jq -r '.source//empty' <<< $extra_obj | envsubst)"
+        extra_dest="$(jq -r '.dest//empty' <<< $extra_obj | envsubst)"
+        extra_contents="$(jq -r '.contents//empty' <<< $extra_obj | envsubst)"
 
         handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -c "$extra_contents")
       done < <(echo "$component_extras" | jq -c '.[]')
