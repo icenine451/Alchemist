@@ -41,12 +41,14 @@ If it is called from inside of a git repo, the repo root will be assigned to the
 Here is an example recipe fragment containing only a single downloaded source.
 
 {
-  "azahar": {
-    "source_url": "https://github.com/azahar-emu/azahar/releases/download/{VERSION}/*.AppImage",
-    "source_type": "github-release",
-    "version": "$AZAHAR_DESIRED_VERSION",
-    "extraction_type": "appimage"
-  }
+  "azahar": [
+      {
+      "source_url": "https://github.com/azahar-emu/azahar/releases/download/{VERSION}/*.AppImage",
+      "source_type": "github-release",
+      "version": "$AZAHAR_DESIRED_VERSION",
+      "extraction_type": "appimage"
+    }
+  ]
 }
 
 Breaking down this ingredient gives us the following information used by the Alchemist:
@@ -75,27 +77,29 @@ The logic for this recipe then breaks down to:
 An expansion of this recipe to include asset gathering, including files from the extracted AppImage as well as needed libraries would be:
 
 {
-  "azahar": {
-    "source_url": "https://github.com/azahar-emu/azahar/releases/download/{VERSION}/*.AppImage",
-    "source_type": "github-release",
-    "version": "$AZAHAR_DESIRED_VERSION",
-    "extraction_type": "appimage",
-    "assets": [
+  "azahar": [
       {
-        "type": "dir",
-        "source": "usr/bin",
-        "dest": "bin"
-      }
-    ],
-    "libs": [
-      {
-        "library": "libQt6Widgets.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      }
-    ]
-  }
+      "source_url": "https://github.com/azahar-emu/azahar/releases/download/{VERSION}/*.AppImage",
+      "source_type": "github-release",
+      "version": "$AZAHAR_DESIRED_VERSION",
+      "extraction_type": "appimage",
+      "assets": [
+        {
+          "type": "dir",
+          "source": "usr/bin",
+          "dest": "bin"
+        }
+      ],
+      "libs": [
+        {
+          "library": "libQt6Widgets.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        }
+      ]
+    }
+  ]
 }
 
 Breaking down the new additions gives us the following information used by the Alchemist:
@@ -122,70 +126,72 @@ The logic for this recipe then breaks down to:
 An expansion of this recipe to a complete version, which would result in a finalized component artifact would be:
 
 {
-  "azahar": {
-    "source_url": "https://github.com/azahar-emu/azahar/releases/download/{VERSION}/*.AppImage",
-    "source_type": "github-release",
-    "version": "$AZAHAR_DESIRED_VERSION",
-    "extraction_type": "appimage",
-    "assets": [
+  "azahar": [
       {
-        "type": "dir",
-        "source": "usr/bin",
-        "dest": "bin"
-      }
-    ],
-    "libs": [
-      {
-        "library": "libQt6Widgets.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      },
-      {
-        "library": "libQt6Gui.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      },
-      {
-        "library": "libQt6Core.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      },
-      {
-        "library": "libQt6Multimedia.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      },
-      {
-        "library": "libQt6Network.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      },
-      {
-        "library": "libQt6DBus.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      },
-      {
-        "library": "libQt6Concurrent.so.6",
-        "runtime_name": "org.kde.Platform",
-        "runtime_version": "6.9",
-        "dest": "shared-libs"
-      }
-    ],
-    "extras": [
-      {
-        "type": "dir",
-        "source": "$REPO_ROOT/$component_name",
-        "dest": "$COMPONENT_ARTIFACT_ROOT"
-      }
-    ]
-  }
+      "source_url": "https://github.com/azahar-emu/azahar/releases/download/{VERSION}/*.AppImage",
+      "source_type": "github-release",
+      "version": "$AZAHAR_DESIRED_VERSION",
+      "extraction_type": "appimage",
+      "assets": [
+        {
+          "type": "dir",
+          "source": "usr/bin",
+          "dest": "bin"
+        }
+      ],
+      "libs": [
+        {
+          "library": "libQt6Widgets.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        },
+        {
+          "library": "libQt6Gui.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        },
+        {
+          "library": "libQt6Core.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        },
+        {
+          "library": "libQt6Multimedia.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        },
+        {
+          "library": "libQt6Network.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        },
+        {
+          "library": "libQt6DBus.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        },
+        {
+          "library": "libQt6Concurrent.so.6",
+          "runtime_name": "org.kde.Platform",
+          "runtime_version": "6.9",
+          "dest": "shared-libs"
+        }
+      ],
+      "extras": [
+        {
+          "type": "dir",
+          "source": "$REPO_ROOT/$component_name",
+          "dest": "$COMPONENT_ARTIFACT_ROOT"
+        }
+      ]
+    }
+  ]
 }
 
 Breaking down the new additions gives us the following information used by the Alchemist:
@@ -281,39 +287,39 @@ can then use data from the first object, as it was processed first.
 Here is an example of a simplified recipe showing extracting a nested archive:
 
 {
-"retroarch": {
-    "source_url": "https://buildbot.libretro.com/stable/{VERSION}/linux/x86_64/RetroArch.7z",
-    "source_type": "http",
-    "version": "1.21.0",
-    "extraction_type": "archive",
-    "additional_sources": [
-      {
-        "source_url": "RetroArch.7z-extracted/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage",
-        "source_type": "local",
-        "extraction_type": "appimage",
-        "assets": [
-          {
-            "type": "dir",
-            "source": "usr/bin",
-            "dest": "bin"
-          }
-        ]
-      },
-      {
-        "source_url": "https://buildbot.libretro.com/stable/{VERSION}/linux/x86_64/RetroArch_cores.7z",
-        "source_type": "http",
-        "version": "1.21.0",
-        "extraction_type": "archive",
-        "assets": [
-          {
-            "type": "dir",
-            "source": "RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage.home/.config/retroarch/cores",
-            "dest": "cores"
-          }
-        ]
-      }
-    ]
-  }
+"retroarch": [
+    {
+      "source_url": "https://buildbot.libretro.com/stable/{VERSION}/linux/x86_64/RetroArch.7z",
+      "source_type": "http",
+      "version": "1.21.0",
+      "extraction_type": "archive"
+    },
+    {
+      "source_url": "$EXTRACTED_PATH/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage",
+      "source_type": "local",
+      "extraction_type": "appimage",
+      "assets": [
+        {
+          "type": "dir",
+          "source": "usr/bin",
+          "dest": "bin"
+        }
+      ]
+    },
+    {
+      "source_url": "https://buildbot.libretro.com/stable/{VERSION}/linux/x86_64/RetroArch_cores.7z",
+      "source_type": "http",
+      "version": "1.21.0",
+      "extraction_type": "archive",
+      "assets": [
+        {
+          "type": "dir",
+          "source": "RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage.home/.config/retroarch/cores",
+          "dest": "cores"
+        }
+      ]
+    }
+  ]
 }
 
 This recipe therefor contains three "source" objects to be processed:
@@ -329,7 +335,7 @@ This recipe therefor contains three "source" objects to be processed:
   2. An appimage file, extracted from a local source, with an asset to gather.
   
   {
-    "source_url": "RetroArch.7z-extracted/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage",
+    "source_url": "$EXTRACTED_PATH/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage",
     "source_type": "local",
     "extraction_type": "appimage",
     "assets": [
@@ -360,7 +366,7 @@ This recipe therefor contains three "source" objects to be processed:
 The order these would be processed is as follows:
   Object 1. The archive 'RetroArch.7z' is downloaded from the internet and placed into '$WORKDIR'. It is then extracted as an 'archive', into the default destination directory of '$WORKDIR/RetroArch.7z-extracted'.
      As this source has no other actions (no asset / lib / extra gathering), the Alchemist moves on to the next object.
-  Object 2. The local appimage '$WORKDIR/RetroArch.7z-extracted/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage' (as extracted from the previous step) is then extracted, and the defined asset '$WORKDIR/$EXTRACTED_PATH/usr/bin/' is gathered to '$COMPONENT_ARTIFACT_ROOT/bin/'.
+  Object 2. The local appimage '$WORKDIR/$EXTRACTED_PATH/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage' (as extracted from the previous step) is then extracted, and the defined asset '$WORKDIR/$EXTRACTED_PATH/usr/bin/' is gathered to '$COMPONENT_ARTIFACT_ROOT/bin/'.
   Object 3. A wholly new archive is downloaded from the internet, extracted, and the asset '$WORKDIR/$EXTRACTED_PATH/RetroArch-Linux-x86_64/RetroArch-Linux-x86_64.AppImage.home/.config/retroarch/cores/' is gathered to '$COMPONENT_ARTIFACT_ROOT/cores/'
 
 While this process of extracting a nested archive as separate objects may appear to be overly verbose,
@@ -418,11 +424,6 @@ Valid Key Value Reference:
     - flatpak (As local Flatpak files do not need further extraction, this is a dummy plugin which returns '$DOWNLOADED_FILE' as '$EXTRACTED_PATH')
 
   Additional types can be supported through the creation of new "extractor" plugins. The plugin code structure is generally consistent, so refer to existing plugins for information on creating new ones.
-
-.<root key>.additional_sources
-  This is an array of objects for additional sources that may be needed for the component to be completed.
-  Each object in this array contains all the same keys and arrays as the "core" recipe, so all keys in this reference are equally valid within those objects.
-  See the "Alchemist Process Abstraction" section for more information on proper 'additional_sources' usage.
 
 .<root key>.dest
   The destination of a given download or extraction can be provided using this key. The path provided here is absolute, so be sure to use placeholders appropriately.
