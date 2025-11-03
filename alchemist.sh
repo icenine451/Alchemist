@@ -52,12 +52,6 @@ transmute() {
   export COMPONENT_ARTIFACT_ROOT="$WORKDIR/$COMPONENT_NAME-artifact" # Initialize the final destination for kept files
   mkdir -p "$COMPONENT_ARTIFACT_ROOT"
 
-  combined_sources_array=$(echo "$component_recipe_contents" | jq -c '
-    .[] as $parent |
-    ([$parent] + ($parent.additional_sources // [])) |
-    map(del(.additional_sources))
-  ')
-
   while read -r source_obj; do
     source_type="$(jq -r '.source_type' <<< $source_obj)"
     source_url="$(jq -r '.source_url' <<< $source_obj | envsubst)"
@@ -123,7 +117,7 @@ transmute() {
         handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -c "$extra_contents")
       done < <(echo "$component_extras" | jq -c '.[]')
     fi
-  done < <(echo "$combined_sources_array" | jq -c '.[]')
+  done < <(echo $component_recipe_contents | jq -c --arg component_name "$COMPONENT_NAME" '.[$component_name].[]')
 }
 
 parse_args() {
