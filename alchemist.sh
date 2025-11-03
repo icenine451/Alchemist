@@ -118,6 +118,50 @@ transmute() {
       done < <(echo "$component_extras" | jq -c '.[]')
     fi
   done < <(echo $component_recipe_contents | jq -c --arg component_name "$COMPONENT_NAME" '.[$component_name].[]')
+
+  # Artifact compression stage
+  local final_artifact_dir="$REPO_ROOT/$COMPONENT_NAME/artifacts"
+
+  if [[ ! -d "$final_artifact_dir" ]]; then
+    mkdir -p "$final_artifact_dir"
+  fi
+
+  local artifact_tar_file="$final_artifact_dir/$COMPONENT_NAME.tar.gz"
+  if [[ -f "$artifact_tar_file" ]]; then
+    log warn "Existing $artifact_tar_file found, deleting before creating a new one."
+    rm -f "$artifact_tar_file"
+  fi
+
+  local artifact_sha_file="$final_artifact_dir/$COMPONENT_NAME.tar.gz.sha"
+  if [[ -f "$artifact_sha_file" ]]; then
+    log warn "Existing sha file $artifact_sha_file found, deleting before creating a new one."
+    rm -f "$artifact_sha_file"
+  fi
+
+  if ! tar -czf "$artifact_tar_file" -C "$COMPONENT_ARTIFACT_ROOT" .; then
+    log error "Artifact tar file $artifact_tar_file could not be created."
+    return 1
+  fi
+
+  sha256sum "$artifact_tar_file" | awk '{print $1}' > "$artifact_sha_file"
+
+  if [[ -d "$WORKDIR" ]]; then
+    log info "Cleaning up work dir $WORKDIR"
+    rm -rf "$WORKDIR"
+  fi
+
+  log debug "Final artifact contents:"
+  tar -tzf "$artifact_tar_file" | while read -r line; do
+    log debug "  $line"
+  done
+
+  log info "Cleaning up artifacts directory, keeping only archive and checksum..."
+  find "$final_artifact_dir" -mindepth 1 -maxdepth 1 \
+          ! -name "$(basename "$artifact_tar_file")" \
+          ! -name "$(basename "$artifact_sha_file")" \
+          -exec rm -rf {} +
+
+  log info "Finalization complete for $COMPONENT_NAME"
 }
 
 parse_args() {
