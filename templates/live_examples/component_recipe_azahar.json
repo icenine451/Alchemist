@@ -61,6 +61,11 @@
           "type": "dir",
           "source": "$REPO_ROOT/$COMPONENT_NAME",
           "dest": ""
+        },
+        {
+          "type": "create",
+          "dest": "version.txt",
+          "contents": "$SOURCE_VERSION"
         }
       ]
     }
