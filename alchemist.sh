@@ -55,7 +55,7 @@ transmute() {
   while read -r source_obj; do
     source_type="$(jq -r '.source_type' <<< $source_obj)"
     source_url="$(jq -r '.source_url' <<< $source_obj | envsubst)"
-    source_version="$(jq -r '.version' <<< $source_obj | envsubst)"
+    export SOURCE_VERSION="$(jq -r '.version' <<< $source_obj | envsubst)"
     source_dest="$(jq -r '.dest//empty' <<< $source_obj | envsubst)"
     extraction_type="$(jq -r '.extraction_type' <<< $source_obj)"
 
@@ -64,7 +64,7 @@ transmute() {
     fi
 
     # Download stage for this object
-    download_result=$(process_download -t "$source_type" -u "$source_url" -d "$source_dest" -v "$source_version")
+    download_result=$(process_download -t "$source_type" -u "$source_url" -d "$source_dest" -v "$SOURCE_VERSION")
     export DOWNLOADED_FILE=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
 
     # Extraction stage for this object
