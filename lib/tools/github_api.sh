@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Extract owner and repo from GitHub URL
-# Usage: parse_github_url <url>
-# Outputs: owner repo (space-separated)
+# USAGE: parse_github_url <url>
+# RETURNS: owner repo (space-separated)
 parse_github_url() {
   local url="$1"
 
@@ -19,11 +19,11 @@ parse_github_url() {
 }
 
 # Handle GitHub API rate limiting by reading information in header files
-# Usage: handle_rate_limit <response_headers_file>
+# USAGE: handle_rate_limit <response_headers_file>
 handle_rate_limit() {
   local headers_file="$1"
 
-  if [ ! -f "$headers_file" ]; then
+  if [[ ! -f "$headers_file" ]]; then
     return 0
   fi
 
@@ -52,8 +52,8 @@ handle_rate_limit() {
 }
 
 # Get the latest release version from GitHub
-# Usage: get_latest_release_version <owner> <repo>
-# Outputs: version tag (e.g., v1.2.3)
+# USAGE: get_latest_release_version <owner> <repo>
+# RETURNS: version tag (e.g., v1.2.3)
 get_latest_release_version() {
   local owner="$1"
   local repo="$2"
@@ -75,10 +75,45 @@ get_latest_release_version() {
 
   # Parse tag_name from JSON response
   local version
-  version=$(echo "$response" | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+  version=$(echo "$response" | jq -r '.tag_name')
 
   if [ -z "$version" ]; then
-    log_error "Could not parse version from GitHub API response"
+    log_error "Could not parse latest version from GitHub API response"
+    return 1
+  fi
+
+  echo "$version"
+  return 0
+}
+
+# Get the most recent release version from GitHub, including pre-releases
+# USAGE: get_newest_release_version <owner> <repo>
+# RETURNS: version tag (e.g., v1.2.3)
+get_newest_release_version() {
+  local owner="$1"
+  local repo="$2"
+  local headers_file
+  headers_file=$(mktemp)
+
+  local api_url="https://api.github.com/repos/$owner/$repo/releases"
+  local response
+  response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
+  local curl_exit=$?
+
+  handle_rate_limit "$headers_file"
+  rm -f "$headers_file"
+
+  if [[ "$curl_exit" -ne 0 ]]; then
+    log_error "Failed to fetch newest release for $owner/$repo"
+    return 1
+  fi
+
+  # Parse tag_name from JSON response
+  local version
+  version=$(echo "$response" | jq -r 'sort_by(.published_at) | reverse | .[0].tag_name')
+
+  if [ -z "$version" ]; then
+    log_error "Could not parse newest version from GitHub API response"
     return 1
   fi
 
@@ -87,8 +122,8 @@ get_latest_release_version() {
 }
 
 # Get release asset download URL matching a pattern
-# Usage: get_release_asset_url <owner> <repo> <version> <pattern>
-# Outputs: download URL
+# USAGE: get_release_asset_url <owner> <repo> <version> <pattern>
+# RETURNS: download URL
 get_release_asset_url() {
   local owner="$1"
   local repo="$2"
@@ -115,7 +150,7 @@ get_release_asset_url() {
 
   # Extract all asset names and URLs
   local assets
-  assets=$(echo "$response" | grep -o '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+  assets=$(echo "$response" | jq -r '.assets[].browser_download_url')
 
   # Find matching asset
   local matched_url
