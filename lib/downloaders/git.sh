@@ -14,6 +14,16 @@ download() {
   local max_delay="${7:-30}"
 
   local final_dest="$dest"
+  local resolved_git_commit="$version"
+
+  # Parse GitHub URL to get owner/repo
+  local owner repo
+  read -r owner repo <<< "$(parse_github_url "$url")"
+
+  if [[ ! -n "$owner" || ! -n "$repo" ]]; then
+    log error "Could not parse GitHub owner/repo from URL: $url"
+    return 1
+  fi
 
   if [[ ! "$final_dest" = /* ]]; then # If provided source path is relative
     final_dest="$WORKDIR/$final_dest"
@@ -24,19 +34,28 @@ download() {
     mkdir -p "$final_dest"
   fi
 
+  if [[ "$version" == "latest" ]]; then # Resolve "latest" commit if needed
+    log info "Resolving $version commit for $url"
+    resolved_git_commit=$(get_latest_git_commit_version "$owner" "$repo")
+    if [[ $? -ne 0 || -z "$resolved_git_commit" ]]; then
+      log error "Failed to resolve latest git commit"
+      return 1
+    fi
+    log info "Resolved latest version: $resolved_git_commit"
+  fi
+
   log info "Cloning repository: $url"
+  log info "Commit hash: $resolved_git_commit"
   log info "Destination: $final_dest"
 
   download_cmd() {
     git clone --depth 1 "$1" "$2"
-    if [[ -n "$3" && ! "$3" == "latest" ]]; then
-      cd $(basename "$2")
-      git fetch --depth 1 origin "$3"
-      git checkout "$3"
-    fi
+    cd $(basename "$2")
+    git fetch --depth 1 origin "$3"
+    git checkout "$3"
   }
 
-  if ! try "$max_retries" "$initial_delay" "$max_delay" download_cmd "$url" "$final_dest" "$version"; then
+  if ! try "$max_retries" "$initial_delay" "$max_delay" download_cmd "$url" "$final_dest" "$resolved_git_commit"; then
     log error "Git clone failed: $base_url"
     return 1
   fi
