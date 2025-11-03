@@ -39,13 +39,21 @@ download() {
     fi
 
     if [[ "$version" == "latest" ]]; then # Resolve "latest" version if needed
-      log info "Resolving latest version for $owner/$repo"
+      log info "Resolving $version version for $owner/$repo"
       resolved_version=$(get_latest_release_version "$owner" "$repo")
       if [[ $? -ne 0 || -z "$resolved_version" ]]; then
         log error "Failed to resolve latest version"
         return 1
       fi
       log info "Resolved latest version: $resolved_version"
+    elif [[ "$version" == "newest" ]]; then
+      log info "Resolving $version version for $owner/$repo"
+      resolved_version=$(get_newest_release_version "$owner" "$repo")
+      if [[ $? -ne 0 || -z "$resolved_version" ]]; then
+        log error "Failed to resolve newest version"
+        return 1
+      fi
+      log info "Resolved newest version: $resolved_version"
     fi
 
     if has_version_placeholder "$url"; then # Substitute version in URL, if needed
