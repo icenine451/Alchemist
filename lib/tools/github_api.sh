@@ -19,7 +19,7 @@ parse_github_url() {
 }
 
 # Handle GitHub API rate limiting by reading information in header files
-# USAGE: handle_rate_limit <response_headers_file>
+# USAGE: handle_github_rate_limit <response_headers_file>
 handle_github_rate_limit() {
   local headers_file="$1"
 
@@ -65,7 +65,7 @@ get_latest_github_release_version() {
   response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
   local curl_exit=$?
 
-  handle_rate_limit "$headers_file"
+  handle_github_rate_limit "$headers_file"
   rm -f "$headers_file"
 
   if [[ "$curl_exit" -ne 0 ]]; then
@@ -100,7 +100,7 @@ get_newest_github_release_version() {
   response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
   local curl_exit=$?
 
-  handle_rate_limit "$headers_file"
+  handle_github_rate_limit "$headers_file"
   rm -f "$headers_file"
 
   if [[ "$curl_exit" -ne 0 ]]; then
@@ -137,7 +137,7 @@ get_github_release_asset_url() {
   response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
   local curl_exit=$?
 
-  handle_rate_limit "$headers_file" # Make sure we aren't in GitHub API timeout
+  handle_github_rate_limit "$headers_file" # Make sure we aren't in GitHub API timeout
   rm -f "$headers_file"
 
   if [[ "$curl_exit" -ne 0 ]]; then
