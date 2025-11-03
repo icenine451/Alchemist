@@ -20,7 +20,7 @@ parse_github_url() {
 
 # Handle GitHub API rate limiting by reading information in header files
 # USAGE: handle_rate_limit <response_headers_file>
-handle_rate_limit() {
+handle_github_rate_limit() {
   local headers_file="$1"
 
   if [[ ! -f "$headers_file" ]]; then
@@ -52,9 +52,9 @@ handle_rate_limit() {
 }
 
 # Get the latest release version from GitHub
-# USAGE: get_latest_release_version <owner> <repo>
+# USAGE: get_latest_github_release_version <owner> <repo>
 # RETURNS: version tag (e.g., v1.2.3)
-get_latest_release_version() {
+get_latest_github_release_version() {
   local owner="$1"
   local repo="$2"
   local headers_file
@@ -77,7 +77,7 @@ get_latest_release_version() {
   local version
   version=$(echo "$response" | jq -r '.tag_name')
 
-  if [ -z "$version" ]; then
+  if [[ -z "$version" ]]; then
     log_error "Could not parse latest version from GitHub API response"
     return 1
   fi
@@ -87,9 +87,9 @@ get_latest_release_version() {
 }
 
 # Get the most recent release version from GitHub, including pre-releases
-# USAGE: get_newest_release_version <owner> <repo>
+# USAGE: get_newest_github_release_version <owner> <repo>
 # RETURNS: version tag (e.g., v1.2.3)
-get_newest_release_version() {
+get_newest_github_release_version() {
   local owner="$1"
   local repo="$2"
   local headers_file
@@ -112,7 +112,7 @@ get_newest_release_version() {
   local version
   version=$(echo "$response" | jq -r 'sort_by(.published_at) | reverse | .[0].tag_name')
 
-  if [ -z "$version" ]; then
+  if [[ -z "$version" ]]; then
     log_error "Could not parse newest version from GitHub API response"
     return 1
   fi
@@ -124,7 +124,7 @@ get_newest_release_version() {
 # Get release asset download URL matching a pattern
 # USAGE: get_release_asset_url <owner> <repo> <version> <pattern>
 # RETURNS: download URL
-get_release_asset_url() {
+get_github_release_asset_url() {
   local owner="$1"
   local repo="$2"
   local version="$3"
