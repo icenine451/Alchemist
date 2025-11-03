@@ -40,7 +40,7 @@ download() {
 
     if [[ "$version" == "latest" ]]; then # Resolve "latest" version if needed
       log info "Resolving $version version for $owner/$repo"
-      resolved_version=$(get_latest_release_version "$owner" "$repo")
+      resolved_version=$(get_latest_github_release_version "$owner" "$repo")
       if [[ $? -ne 0 || -z "$resolved_version" ]]; then
         log error "Failed to resolve latest version"
         return 1
@@ -48,7 +48,7 @@ download() {
       log info "Resolved latest version: $resolved_version"
     elif [[ "$version" == "newest" ]]; then
       log info "Resolving $version version for $owner/$repo"
-      resolved_version=$(get_newest_release_version "$owner" "$repo")
+      resolved_version=$(get_newest_github_release_version "$owner" "$repo")
       if [[ $? -ne 0 || -z "$resolved_version" ]]; then
         log error "Failed to resolve newest version"
         return 1
@@ -67,7 +67,7 @@ download() {
     asset_name=$(basename "$final_url")
     if [[ "$asset_name" == *"*"* ]]; then
       log info "Resolving wildcard pattern: $asset_name"
-      final_url=$(get_release_asset_url "$owner" "$repo" "$resolved_version" "$asset_name")
+      final_url=$(get_github_release_asset_url "$owner" "$repo" "$resolved_version" "$asset_name")
       if [[ $? -ne 0 || -z "$final_url" ]]; then
         log error "Failed to resolve asset URL"
         return 1
