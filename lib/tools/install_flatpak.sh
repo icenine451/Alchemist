@@ -11,7 +11,7 @@ install_flatpak() {
     return 1
   fi
 
-  if [[ ! -n "$flatpak_version" ]]; then # If a specific version was given, add it to the Flatpak ID
+  if [[ ! -n "$flatpak_version" ]]; then
     log error "Flatpak version not defined"
     return 1
   fi
@@ -19,9 +19,7 @@ install_flatpak() {
   if [[ "$flatpak_source_type" == "app" ]]; then
     flatpak_install_cmd() {
       flatpak install --"$1" -y --noninteractive flathub "$2"
-      if [[ ! "$3" == "latest" ]]; then
-        flatpak update --"$1" -y --noninteractive --commit="$3" "$2"
-      fi
+      flatpak update --"$1" -y --noninteractive --commit="$3" "$2"
     }
   elif [[ "$flatpak_source_type" == "runtime" ]]; then # Is a flatpak runtime
     flatpak_install_cmd() {
