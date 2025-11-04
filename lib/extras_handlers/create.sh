@@ -10,7 +10,11 @@ handle_extras() {
   local dest="$3"
   local contents="$4"
 
-  local final_dest="$COMPONENT_ARTIFACT_ROOT/$dest"
+  local final_dest="$dest"
+
+  if [[ ! "$final_dest" = /* ]]; then # If provided dest path is relative
+    final_dest="$COMPONENT_ARTIFACT_ROOT/$dest"
+  fi
 
   log info "Creating file $final_dest"
 

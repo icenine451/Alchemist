@@ -10,10 +10,14 @@ handle_extras() {
   local dest="$3"
 
   local final_source="$source"
-  local final_dest="$COMPONENT_ARTIFACT_ROOT/$dest"
+  local final_dest="$dest"
 
   if [[ ! "$final_source" = /* ]]; then # If provided source path is relative
     final_source="$WORKDIR/$source"
+  fi
+
+  if [[ ! "$final_dest" = /* ]]; then # If provided dest path is relative
+    final_dest="$COMPONENT_ARTIFACT_ROOT/$dest"
   fi
 
   case "$type" in
