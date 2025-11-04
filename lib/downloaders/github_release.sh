@@ -1,7 +1,7 @@
 #!/bin/bash
 
 downloader_info() {
-  echo "type:github-release"
+  echo "type:github_release"
 }
 
 is_github_release_url() {

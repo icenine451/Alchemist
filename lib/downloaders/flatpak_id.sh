@@ -2,7 +2,7 @@
 
 # Describe this downloader's capabilities
 downloader_info() {
-  echo "type:flatpak-id"
+  echo "type:flatpak_id"
 }
 
 download() {
