@@ -36,7 +36,7 @@ download() {
     log info "Resolved latest version: $resolved_flatpak_version"
   fi
 
-  log info "Downloading: $final_flatpak_id"
+  log info "Downloading: $flatpak_id"
   log info "Destination: $final_dest"
   log info "Flatpak Install Mode: $flatpak_install_mode"
 
@@ -45,7 +45,7 @@ download() {
   }
 
   if ! try "$max_retries" "$initial_delay" "$max_delay" download_cmd; then
-    log error "Download failed: $final_flatpak_id"
+    log error "Download failed: $flatpak_id"
     return 1
   fi
 
