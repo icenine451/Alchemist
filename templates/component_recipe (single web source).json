@@ -10,6 +10,11 @@
           "type": "dir",
           "source": "usr/bin",
           "dest": "bin"
+        },
+        {
+          "type": "dir",
+          "source": "$REPO_ROOT/$component_name",
+          "dest": "$COMPONENT_ARTIFACT_ROOT"
         }
       ],
       "libs": [
@@ -23,13 +28,6 @@
           "library": "specificComponentLib.so.6",
           "source": "usr/lib",
           "dest": "lib"
-        }
-      ],
-      "extras": [
-        {
-          "type": "dir",
-          "source": "$REPO_ROOT/$component_name",
-          "dest": "$COMPONENT_ARTIFACT_ROOT"
         }
       ]
     }

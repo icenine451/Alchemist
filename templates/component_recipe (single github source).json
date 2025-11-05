@@ -10,6 +10,20 @@
           "type": "dir",
           "source": "usr/bin",
           "dest": "bin"
+        },
+        {
+          "type": "dir",
+          "source": "$PWD",
+          "dest": "$COMPONENT_ARTIFACT_ROOT"
+        },
+        {
+          "type": "symlink",
+          "source": "/var/config/component",
+          "dest": "$COMPONENT_ARTIFACT_ROOT/portable"
+        },
+        {
+          "type": "create",
+          "dest": "$COMPONENT_ARTIFACT_ROOT/portable.txt"
         }
       ],
       "libs": [
@@ -23,22 +37,6 @@
           "library": "specificComponentLib.so.6",
           "source": "usr/lib",
           "dest": "lib"
-        }
-      ],
-      "extras": [
-        {
-          "type": "dir",
-          "source": "$PWD",
-          "dest": "$COMPONENT_ARTIFACT_ROOT"
-        },
-        {
-          "type": "symlink",
-          "source": "/var/config/copmponent",
-          "dest": "$COMPONENT_ARTIFACT_ROOT/portable"
-        },
-        {
-          "type": "create",
-          "dest": "$COMPONENT_ARTIFACT_ROOT/portable.txt"
         }
       ]
     }
