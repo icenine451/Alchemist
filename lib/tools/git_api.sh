@@ -8,11 +8,11 @@ get_latest_git_commit_version() {
   local repo="$2"
 
   local response
-  response=$(curl -s "https://api.github.com/repos/$owner/$repo/commits/main" 2>&1)
+  response=$(curl -s "https://api.github.com/repos/$owner/$repo/commits/HEAD" 2>&1)
   local curl_exit=$?
 
   if [[ "$curl_exit" -ne 0 ]]; then
-    log_error "Failed to fetch latest release for https://api.github.com/repos/$owner/$repo/commits/main"
+    log_error "Failed to fetch latest release for https://api.github.com/repos/$owner/$repo/commits/HEAD"
     return 1
   fi
 
