@@ -9,7 +9,13 @@ extract() {
   local dest="$2"
   local type="$3"
 
-  local final_dest="$dest/$(basename $archive)-extracted"
+  local final_dest="$dest"
+
+  if [[ ! "$dest" = /* ]]; then # If provided dest path is relative
+    final_dest="$WORKDIR/$final_dest"
+  fi
+
+  final_dest="$final_dest/$(basename $archive)-extracted"
 
   local filename="$(basename $archive)"
 
