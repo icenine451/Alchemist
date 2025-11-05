@@ -72,21 +72,21 @@ assemble() {
       assemble_cmd() {
         cp -r "$1" "$2"
       }
-      ;;
+    ;;
     file)
       assemble_cmd() {
         cp "$1" "$2"
       }
-      ;;
+    ;;
     merge)
       assemble_cmd() {
         cp -nr "$1" "$2"
       }
-      ;;
+    ;;
     *)
       log error "Error: Unsupported asset type: $type"
       return 1
-      ;;
+    ;;
   esac
 
   if ! assemble_cmd "$final_source" "$final_dest"; then
