@@ -16,7 +16,7 @@ get_latest_flatpak_release_version() {
   fi
 
   local version
-  version=$(echo "$response" | grep "Commit:" | awk '{print $2}')
+  version=$(echo "$response" | grep -E 'Commit:|Incheckning:' | awk '{print $2}')
 
   if [[ -z "$version" ]]; then
     log_error "Could not parse latest version flatpak remote-info command"
