@@ -66,6 +66,7 @@ transmute() {
     # Download stage for this object
     download_result=$(process_download -t "$source_type" -u "$source_url" -d "$source_dest" -v "$SOURCE_VERSION")
     export DOWNLOADED_FILE=$(echo "$download_result" | grep "^DOWNLOADED_FILE=" | cut -d= -f2)
+    export SOURCE_VERSION=$(echo "$download_result" | grep "^DOWNLOADED_VERSION=" | cut -d= -f2)
 
     # Extraction stage for this object
     extraction_result=$(process_extract -f "$DOWNLOADED_FILE" -d "$source_dest" -t "$extraction_type")

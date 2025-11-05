@@ -54,6 +54,7 @@ download() {
   fi
 
   log info "Flatpak install completed successfully"
+  echo "DOWNLOADED_VERSION=$flatpak_version"
   echo "DOWNLOADED_FILE=$final_dest"
   return 0
 }
