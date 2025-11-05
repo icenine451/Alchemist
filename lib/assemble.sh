@@ -80,7 +80,7 @@ assemble() {
     ;;
     merge)
       assemble_cmd() {
-        cp -nr "$1"/* "$2"
+        cp -nr "$1/"* "$2"
       }
     ;;
     *)
