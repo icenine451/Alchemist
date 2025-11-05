@@ -14,8 +14,16 @@ download() {
   local initial_delay="${6:-2}"
   local max_delay="${7:-30}"
 
-  local resolved_flatpak_version="$version"
-
+  if [[ "$flatpak_version" == "latest" ]]; then # Resolve "latest" version if needed
+    log info "Resolving $flatpak_version version for $flatpak_id"
+    flatpak_version=$(get_latest_flatpak_release_version "$flatpak_id")
+    if [[ $? -ne 0 || -z "$flatpak_version" ]]; then
+      log error "Failed to resolve latest version"
+      return 1
+    fi
+    log info "Resolved latest version: $flatpak_version"
+  fi
+  
   if [[ "$flatpak_install_mode" == "user" ]]; then
     final_dest="$FLATPAK_USER_ROOT/app/$flatpak_id/current/$flatpak_version/files"
   elif [[ "$flatpak_install_mode" == "system" ]]; then
@@ -26,22 +34,12 @@ download() {
     final_dest="$FLATPAK_USER_ROOT/app/$flatpak_id/current/$flatpak_version/files"
   fi
 
-  if [[ "$version" == "latest" ]]; then # Resolve "latest" version if needed
-    log info "Resolving $version version for $flatpak_id"
-    resolved_flatpak_version=$(get_latest_flatpak_release_version "$flatpak_id")
-    if [[ $? -ne 0 || -z "$resolved_flatpak_version" ]]; then
-      log error "Failed to resolve latest version"
-      return 1
-    fi
-    log info "Resolved latest version: $resolved_flatpak_version"
-  fi
-
   log info "Downloading: $flatpak_id"
   log info "Destination: $final_dest"
   log info "Flatpak Install Mode: $flatpak_install_mode"
 
   download_cmd() {
-    install_flatpak "$flatpak_id" "$resolved_flatpak_version" "$flatpak_install_mode" "app" 2>&1
+    install_flatpak "$flatpak_id" "$flatpak_version" "$flatpak_install_mode" "app" 2>&1
   }
 
   if ! try "$max_retries" "$initial_delay" "$max_delay" download_cmd; then
