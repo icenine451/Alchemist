@@ -67,6 +67,7 @@ download() {
   fi
 
   log info "Clone completed successfully"
+  echo "DOWNLOADED_VERSION=$resolved_git_commit"
   echo "DOWNLOADED_FILE=$final_dest"
   return 0
 }
