@@ -15,38 +15,39 @@ download() {
 
   local resolved_version="$version"
   local final_url="$url"
+  local final_dest="$dest"
 
-  if [[ ! -d "$dest" ]]; then
-    log info "Dest directory $dest does not exist, creating..."
-    mkdir -p "$dest"
+  if [[ ! "$final_dest" = /* ]]; then # If provided dest path is relative
+    final_dest="$WORKDIR/$dest"
+  fi
+
+  if [[ ! -d "$final_dest" ]]; then
+    log info "Dest directory $final_dest does not exist, creating..."
+    mkdir -p "$final_dest"
   fi
 
   if has_version_placeholder "$url"; then # Substitute version placeholder if present
     final_url=$(substitute_version "$url" "$version")
   fi
 
-  # Determine final destination path
-  local final_dest="$dest"
-  if [[ -d "$dest" ]]; then # If the provided dest is a directory
-    # Check if URL looks like it ends with a filename
-    local url_basename
-    url_basename=$(basename "$final_url" | sed 's/[?#].*//')
+  # Check if URL looks like it ends with a filename
+  local url_basename
+  url_basename=$(basename "$final_url" | sed 's/[?#].*//')
 
-    if [[ ! "$url_basename" =~ \.[a-zA-Z0-9]+$ ]]; then # URL doesn't end with a filename, resolve redirects to get final URL
-      log info "Resolving redirects to determine filename..."
+  if [[ ! "$url_basename" =~ \.[a-zA-Z0-9]+$ ]]; then # URL doesn't end with a filename, resolve redirects to get final URL
+    log info "Resolving redirects to determine filename..."
 
-      local resolved_url
-      resolved_url=$(curl -Ls -o /dev/null -w '%{url_effective}' "$final_url" 2>&1)
-      if [[ $? -eq 0 && -n "$resolved_url" ]]; then
-        log info "Resolved URL: $resolved_url"
-        final_url="$resolved_url"
-        url_basename=$(basename "$resolved_url" | sed 's/[?#].*//')
-      else
-        log warn "Could not resolve redirect, using URL basename"
-      fi
+    local resolved_url
+    resolved_url=$(curl -Ls -o /dev/null -w '%{url_effective}' "$final_url" 2>&1)
+    if [[ $? -eq 0 && -n "$resolved_url" ]]; then
+      log info "Resolved URL: $resolved_url"
+      final_url="$resolved_url"
+      url_basename=$(basename "$resolved_url" | sed 's/[?#].*//')
+    else
+      log warn "Could not resolve redirect, using URL basename"
     fi
-    final_dest="$dest/$url_basename"
   fi
+  final_dest="$final_dest/$url_basename"
 
   log info "Downloading: $final_url"
   log info "Destination: $final_dest"
