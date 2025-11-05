@@ -63,7 +63,7 @@ gather_lib() {
 
   local final_source final_dest
 
-  local lib_basename="${name%%.so.*}.so"
+  local lib_basename="${name%%\.so*}.so"
 
   if [[ -n "$runtime_name" && -n "$runtime_version" ]]; then # Lib is from a Flatpak runtime
     final_dest="$COMPONENT_ARTIFACT_ROOT/$dest/$runtime_name/$runtime_version"
