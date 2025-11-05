@@ -127,6 +127,7 @@ transmute() {
     rm -f "$artifact_sha_file"
   fi
 
+  log info "Compressing artifact source $COMPONENT_ARTIFACT_ROOT into $artifact_tar_file"
   if ! tar -czf "$artifact_tar_file" -C "$COMPONENT_ARTIFACT_ROOT" .; then
     log error "Artifact tar file $artifact_tar_file could not be created."
     return 1
