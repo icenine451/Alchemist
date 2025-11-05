@@ -78,6 +78,11 @@ assemble() {
         cp "$1" "$2"
       }
       ;;
+    merge)
+      assemble_cmd() {
+        cp -nr "$1" "$2"
+      }
+      ;;
     *)
       log error "Error: Unsupported asset type: $type"
       return 1
