@@ -44,6 +44,7 @@ handle_extras() {
         fi
         cp -nr "$1/"* "$2"
       }
+    ;;
     *)
       log error "Error: Unsupported type: $type"
       return 1
