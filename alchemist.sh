@@ -19,7 +19,6 @@ source "$SCRIPT_DIR/lib/download.sh"
 source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
 source "$SCRIPT_DIR/lib/libs.sh"
-source "$SCRIPT_DIR/lib/extras.sh"
 source "$SCRIPT_DIR/lib/archive.sh"
 
 log() {
@@ -76,14 +75,17 @@ transmute() {
     obj_assets="$(jq -r '.assets//empty' <<< $source_obj)"
 
     if [[ -n "$obj_assets" && ! "$obj_assets" == '[]' ]]; then
+    log info "Component has listed assets, gathering..."
       while read -r asset_obj; do
         asset_type="$(jq -r '.type' <<< $asset_obj)"
-        asset_source="$(jq -r '.source' <<< $asset_obj | envsubst)"
-        asset_dest="$(jq -r '.dest' <<< $asset_obj | envsubst)"
-        asset_root="$EXTRACTED_PATH"
+        asset_source="$(jq -r '.source//empty' <<< $asset_obj | envsubst)"
+        asset_dest="$(jq -r '.dest//empty' <<< $asset_obj | envsubst)"
+        asset_contents="$(jq -r '.contents//empty' <<< $asset_obj | envsubst)"
 
-        assembly_result=$(process_assemble -t "$asset_type" -s "$asset_source" -d "$asset_dest" -r "$asset_root")
+        assembly_result=$(process_asset -t "$asset_type" -s "$asset_source" -d "$asset_dest" -c "$asset_contents")
       done < <(echo "$obj_assets" | jq -c '.[]')
+    else
+      log info "Component assets omitted or empty, skipping..."
     fi
     
     # Library gathering stage
@@ -98,29 +100,11 @@ transmute() {
         lib_runtime_version="$(jq -r '.runtime_version//empty'<<< $lib_obj | envsubst)"
         lib_source="$(jq -r '.source//empty' <<< $lib_obj | envsubst)"
         lib_dest="$(jq -r '.dest//empty' <<< $lib_obj | envsubst)"
-        lib_source_root="$EXTRACTED_PATH"
 
-        gather_lib_result=$(process_gather_lib -n "$lib_name" -d "$lib_dest" -rn "$lib_runtime_name" -rv "$lib_runtime_version" -s "$lib_source" -r "$lib_source_root")
+        gather_lib_result=$(process_gather_lib -n "$lib_name" -d "$lib_dest" -rn "$lib_runtime_name" -rv "$lib_runtime_version" -s "$lib_source")
       done < <(echo "$obj_libs" | jq -c '.[]')
     else
       log info "Component libs omitted or empty, skipping..."
-    fi
-
-    # Extras gathering stage
-    obj_extras=$(echo "$source_obj" | jq -c '.extras//empty')
-
-    if [[ -n "$obj_extras" && ! "$obj_extras" == '[]' ]]; then
-      log info "Component has listed extras, gathering..."
-      while read -r extra_obj; do
-        extra_type="$(jq -r '.type//empty' <<< $extra_obj)"
-        extra_source="$(jq -r '.source//empty' <<< $extra_obj | envsubst)"
-        extra_dest="$(jq -r '.dest//empty' <<< $extra_obj | envsubst)"
-        extra_contents="$(jq -r '.contents//empty' <<< $extra_obj | envsubst)"
-
-        handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -c "$extra_contents")
-      done < <(echo "$obj_extras" | jq -c '.[]')
-    else
-      log info "Component extras omitted or empty, skipping..."
     fi
   done < <(echo $component_recipe_contents | jq -c --arg component_name "$COMPONENT_NAME" '.[$component_name].[]')
 

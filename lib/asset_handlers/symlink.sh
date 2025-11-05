@@ -1,10 +1,10 @@
 #!/bin/bash
 
-extras_handler_info() {
+asset_handler_info() {
   echo "type:symlink"
 }
 
-handle_extras() {
+handle_asset() {
   local type="$1"
   local source="$2"
   local dest="$3"
@@ -17,11 +17,11 @@ handle_extras() {
 
   log info "Creating symlink $final_source -> $dest"
 
-  process_extras_cmd() {
+  process_asset_cmd() {
     ln -s "$1" "$2"
   }
 
-  if ! process_extras_cmd "$dest" "$final_source"; then
+  if ! process_asset_cmd "$dest" "$final_source"; then
     log error "Symlink $final_source -> $dest could not be created"
     return 1
   fi

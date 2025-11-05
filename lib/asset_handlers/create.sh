@@ -1,10 +1,10 @@
 #!/bin/bash
 
-extras_handler_info() {
+asset_handler_info() {
   echo "type:create"
 }
 
-handle_extras() {
+handle_asset() {
   local type="$1"
   local source="$2"
   local dest="$3"
@@ -19,16 +19,16 @@ handle_extras() {
   log info "Creating file $final_dest"
 
   if [[ -n "$contents" ]]; then
-    process_extras_cmd() {
+    process_asset_cmd() {
       echo "$2" > "$1"
     }
   else
-    process_extras_cmd() {
+    process_asset_cmd() {
       touch "$1"
     }
   fi
 
-  if ! process_extras_cmd "$final_dest" "$contents"; then
+  if ! process_asset_cmd "$final_dest" "$contents"; then
     log error "File $final_dest could not be created"
     return 1
   fi

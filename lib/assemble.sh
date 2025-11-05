@@ -2,11 +2,65 @@
 
 set -euo pipefail
 
-parse_assemble_args() {
+# Associative arrays for asset handler registry
+declare -A ASSET_HANDLER_TYPES
+declare -A ASSET_HANDLER_FILES
+
+# Load all asset handler plugins
+load_asset_handlers() {
+  local asset_handler_dir="$SCRIPT_DIR/lib/asset_handlers"
+
+  if [[ ! -d "$asset_handler_dir" ]]; then
+    log error "Asset handler directory not found: $asset_handler_dir"
+    return 1
+  fi
+
+  for asset_handler_file in "$asset_handler_dir"/*.sh; do
+    if [[ ! -f "$asset_handler_file" ]]; then
+      continue
+    fi
+
+    local filename
+    filename=$(basename "$asset_handler_file")
+
+    # Source the asset handler
+    source "$asset_handler_file"
+
+    # Check if asset_handler_info function exists
+    if ! declare -f asset_handler_info > /dev/null; then
+      log w "Asset handler $filename does not implement asset_handler_info()"
+      continue
+    fi
+
+    # Parse asset handler info
+    local info
+    info=$(asset_handler_info)
+
+    local types
+    types=$(echo "$info" | grep "^type:" | cut -d: -f2)
+
+    if [[ ! -n "$types" ]]; then
+      log error "Asset handler $filename does not specify any types"
+      continue
+    fi
+
+    # Register each type this asset handler handles
+    IFS=',' read -ra TYPE_ARRAY <<< "$types"
+    for type in "${TYPE_ARRAY[@]}"; do
+      type=$(echo "$type" | xargs)  # Trim whitespace
+      ASSET_HANDLER_TYPES["$type"]="$filename"
+      ASSET_HANDLER_FILES["$filename"]="$asset_handler_file"
+    done
+
+    log info "Loaded asset handler: $filename (types: $types)"
+  done
+}
+
+parse_asset_args() {
   type=""
   source=""
   dest=""
-  root=""
+  contents=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -22,8 +76,8 @@ parse_assemble_args() {
         dest="$2"
         shift 2
         ;;
-      -r|--root)
-        root="$2"
+      -c|--contents)
+        contents="$2"
         shift 2
         ;;
       *)
@@ -34,80 +88,29 @@ parse_assemble_args() {
   done
 
   # Validate required arguments
-  if [[ ! -n "$type" || ! -n "$source" || ! -n "$dest" ]]; then
+  if [[ ! -n "$type" || ( ! -n "$source" && ! -n "$dest" ) ]]; then
     log error "Missing required arguments"
     return 1
   fi
-
-  if [[ ! -n "$root" ]]; then # If a root dir for the asset is not defined, assume the workdir
-    root="$WORKDIR"
-  fi
 }
 
-assemble() {
-  local type="$1"
-  local source="$2"
-  local dest="$3"
-  local root="$4"
+process_asset() {
+  load_asset_handlers
 
-  local final_source="$root/$source"
-  local final_dest="$COMPONENT_ARTIFACT_ROOT/$dest"
+  parse_asset_args "$@"
 
-  if [[ ! -e "$final_source" ]]; then
-    log error "Provided source $final_source does not exist, cannot grab asset"
+  # Find appropriate asset handler for the specified type
+  if [[ ! -n "${ASSET_HANDLER_TYPES[$type]:-}" ]]; then
+    log error "No asset handler found for type: $type"
     return 1
   fi
 
-  if [[ "$type" == "file" ]]; then
-    final_dest="$final_dest/$(basename $source)"
-  fi
+  local asset_handler_file="${ASSET_HANDLER_TYPES[$type]}"
+  source "$SCRIPT_DIR/lib/asset_handlers/$asset_handler_file"
+  log info "Using asset handler: $asset_handler_file"
 
-  if [[ ! -d "$(dirname $final_dest)" ]]; then # If destination dir does not already exist
-    log info "Destination dir $(dirname $final_dest) does not exist, creating"
-    mkdir -p "$(dirname $final_dest)"
-  fi
-
-  case "$type" in
-    dir)
-      assemble_cmd() {
-        cp -r "$1" "$2"
-      }
-    ;;
-    file)
-      assemble_cmd() {
-        cp "$1" "$2"
-      }
-    ;;
-    merge)
-      assemble_cmd() {
-        cp -nr "$1/"* "$2"
-      }
-    ;;
-    *)
-      log error "Error: Unsupported asset type: $type"
-      return 1
-    ;;
-  esac
-
-  if ! assemble_cmd "$final_source" "$final_dest"; then
-    log error "Asset $final_source could not be placed in $final_dest, exiting."
-    return 1
-  fi
-
-  if [[ ! -e "$final_dest" ]]; then
-    log error "Asset $final_dest could not be validated, exiting."
-    return 1
-  fi
-
-  log info "Asset $final_source copied to $final_dest"
-  return 0
-}
-
-process_assemble() {
-  parse_assemble_args "$@"
-
-  if ! assemble "$type" "$source" "$dest" "$root"; then
-    log error "Assembling asset failed"
+  if ! handle_asset "$type" "$source" "$dest" "$contents"; then
+    log error "Processing asset files failed"
     return 1
   fi
 
