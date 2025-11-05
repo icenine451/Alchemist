@@ -88,7 +88,7 @@ transmute() {
     # Library gathering stage
     obj_libs=$(echo "$source_obj" | jq -c '.libs//empty')
 
-    if [[ -n "$obj_libs" && ! "$component_libs" == '[]' ]]; then
+    if [[ -n "$obj_libs" && ! "$obj_libs" == '[]' ]]; then
       log info "Component has listed libs, collecting..."
 
       while read -r lib_obj; do
@@ -106,9 +106,9 @@ transmute() {
     fi
 
     # Extras gathering stage
-    component_extras=$(echo "$source_obj" | jq -c '.extras//empty')
+    obj_extras=$(echo "$source_obj" | jq -c '.extras//empty')
 
-    if [[ -n "$component_extras" && ! "$component_extras" == '[]' ]]; then
+    if [[ -n "$obj_extras" && ! "$obj_extras" == '[]' ]]; then
       log info "Component has listed extras, gathering..."
       while read -r extra_obj; do
         extra_type="$(jq -r '.type//empty' <<< $extra_obj)"
@@ -117,7 +117,7 @@ transmute() {
         extra_contents="$(jq -r '.contents//empty' <<< $extra_obj | envsubst)"
 
         handle_extras_result=$(process_handle_extras -t "$extra_type" -s "$extra_source" -d "$extra_dest" -c "$extra_contents")
-      done < <(echo "$component_extras" | jq -c '.[]')
+      done < <(echo "$obj_extras" | jq -c '.[]')
     else
       log info "Component extras omitted or empty, skipping..."
     fi
