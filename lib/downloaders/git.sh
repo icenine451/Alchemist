@@ -50,7 +50,7 @@ download() {
 
   download_cmd() {
     git clone --depth 1 "$1" "$2"
-    cd $(basename "$2")
+    cd "$2"
     git fetch --depth 1 origin "$3"
     git checkout "$3"
   }
