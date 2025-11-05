@@ -1,7 +1,7 @@
 #!/bin/bash
 
 extras_handler_info() {
-  echo "type:dir,file"
+  echo "type:dir,file,merge"
 }
 
 handle_extras() {
@@ -37,6 +37,13 @@ handle_extras() {
         cp -r "$1/"* "$2"
       }
     ;;
+    merge)
+      process_extras_cmd() {
+        if [[ ! -d "$2" ]]; then
+          mkdir -p "$2"
+        fi
+        cp -nr "$1/"* "$2"
+      }
     *)
       log error "Error: Unsupported type: $type"
       return 1
