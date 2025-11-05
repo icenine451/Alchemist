@@ -27,11 +27,15 @@ handle_asset() {
 
   if [[ "$type" == "file" ]]; then
     final_dest="$final_dest/$(basename $final_source)"
-  fi
-
-  if [[ ! -d "$(dirname $final_dest)" ]]; then # If destination dir does not already exist
-    log info "Destination dir $(dirname $final_dest) does not exist, creating"
-    mkdir -p "$(dirname $final_dest)"
+    if [[ ! -d "$(dirname $final_dest)" ]]; then # If destination dir does not already exist
+      log info "Destination dir $(dirname $final_dest) does not exist, creating"
+      mkdir -p "$(dirname $final_dest)"
+    fi
+  elif [[ "$type" == "dir" ]]; then
+    if [[ ! -d "$final_dest" ]]; then # If destination dir does not already exist
+      log info "Destination dir $final_dest does not exist, creating"
+      mkdir -p "$final_dest"
+    fi
   fi
 
   case "$type" in
