@@ -11,7 +11,6 @@ parse_gather_lib_args() {
   source=""
   runtime_name=""
   runtime_version=""
-  root=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -35,10 +34,6 @@ parse_gather_lib_args() {
         runtime_version="$2"
         shift 2
         ;;
-      -r|--root)
-        root="$2"
-        shift 2
-        ;;
       *)
         log error "Unknown option: $1"
         return 1
@@ -59,7 +54,6 @@ gather_lib() {
   local runtime_name="$3"
   local runtime_version="$4"
   local source="$5"
-  local root="$6"
 
   local final_source final_dest
 
@@ -103,11 +97,11 @@ gather_lib() {
       log info "Library $name already exists at $final_dest, skipping..."
       return 0
     fi
-    if [[ ! -e "$root/$source/$name" ]]; then
-      log error "Library $name not found at defined source $root/$source/$name"
+    if [[ ! -e "$EXTRACTED_PATH/$source/$name" ]]; then
+      log error "Library $name not found at defined source $EXTRACTED_PATH/$source/$name"
       return 1
     fi
-    final_source="$root/$source/$lib_basename"
+    final_source="$EXTRACTED_PATH/$source/$lib_basename"
   fi
 
   if [[ ! -d "$final_dest" ]]; then
@@ -127,7 +121,7 @@ gather_lib() {
 process_gather_lib() {
   parse_gather_lib_args "$@"
 
-  if ! gather_lib "$name" "$dest" "$runtime_name" "$runtime_version" "$source" "$root"; then
+  if ! gather_lib "$name" "$dest" "$runtime_name" "$runtime_version" "$source"; then
     log error "Gathering component library $name failed"
     return 1
   fi
