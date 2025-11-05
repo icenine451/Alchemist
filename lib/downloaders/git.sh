@@ -25,8 +25,10 @@ download() {
     return 1
   fi
 
-  if [[ ! "$final_dest" = /* || "$final_dest" == "$WORKDIR" ]]; then # If provided source path is relative or is the base WORKDIR
+  if [[ ! "$final_dest" = /* ]]; then # If provided source path is relative
     final_dest="$WORKDIR/$final_dest"
+  elif [[ "$final_dest" == "$WORKDIR" ]]; then  # or is the base WORKDIR
+    final_dest="$WORKDIR/$repo"
   fi
 
   if [[ ! -d "$final_dest" ]]; then
