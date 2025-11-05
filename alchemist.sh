@@ -74,7 +74,7 @@ transmute() {
     # Assemble stage for this object
     obj_assets="$(jq -r '.assets//empty' <<< $source_obj)"
 
-    if [[ -n "$obj_assets" ]]; then
+    if [[ -n "$obj_assets" && ! "$obj_assets" == '[]' ]]; then
       while read -r asset_obj; do
         asset_type="$(jq -r '.type' <<< $asset_obj)"
         asset_source="$(jq -r '.source' <<< $asset_obj | envsubst)"
