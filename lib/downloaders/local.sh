@@ -7,7 +7,6 @@ downloader_info() {
 download() {
   local source="$1"
   local dest="$2"
-  local version="$3"
 
   local final_source="$source"
   local final_dest="$dest"
@@ -55,14 +54,14 @@ download() {
     final_dest="$dest/$(basename $final_source)"
   fi
 
-  if [[ ! -f "$final_source" ]]; then
-    log error "Supplied local file could not be found at $final_source"
+  if [[ ! -e "$final_source" ]]; then
+    log error "Supplied local source could not be found at $final_source"
     return 1
   fi
 
   final_dest="$final_source"
 
-  log info "Local file $final_dest validated, proceeding to extraction"
+  log info "Local source $final_dest validated, proceeding to extraction"
   echo "DOWNLOADED_FILE=$final_dest"
   return 0
 }
