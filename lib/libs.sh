@@ -115,6 +115,22 @@ gather_lib() {
   fi
 
   log info "Library(s) $final_source* copied to $final_dest/ successfully"
+
+  if [[ "$runtime_name" == "org.kde.Platform" ]]; then # Collect Qt plugins if needed
+    if [[ ! -d "$COMPONENT_ARTIFACT_ROOT/$dest/$runtime_name/$runtime_version/plugins" ]]; then
+      log info "Qt library version $runtime_version does not currently have plugins in $dest. Copying..."
+      if [[ -d "$flatpak_current_root/runtime/$runtime_name/x86_64/$runtime_version/active/files/lib/plugins" ]]; then
+        mkdir -p "$COMPONENT_ARTIFACT_ROOT/$dest/$runtime_name/$runtime_version/plugins"
+        cp -r "$flatpak_current_root/runtime/$runtime_name/x86_64/$runtime_version/active/files/lib/plugins/"* "$COMPONENT_ARTIFACT_ROOT/$dest/$runtime_name/$runtime_version/plugins"
+      else
+        log error "Qt plugins for version $runtime_version could not be found at $flatpak_current_root/runtime/$runtime_name/x86_64/$runtime_version/active/files/lib/plugins"
+        return 1
+      fi
+    else
+      log info "Qt library version $runtime_version already has plugins in $dest. Skipping..."
+    fi
+  fi
+
   return 0
 }
 
