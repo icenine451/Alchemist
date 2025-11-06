@@ -26,6 +26,30 @@ download() {
     final_source="$WORKDIR/$final_source"
   fi
 
+  # Check if local filename contains wildcards and resolve if needed
+  if [[ "$(basename "$final_source")" == *"*"* ]]; then
+    log info "Resolving wildcard pattern: $(basename "$final_source")"
+
+    # Convert wildcard pattern to grep pattern
+    local wildcard_filename=$(basename "$final_source")
+    local grep_pattern="${wildcard_filename//\*/.*}"
+
+    while IFS= read -r file; do
+      local found_filename
+      found_filename=$(basename "$file")
+      if [[ "$found_filename" =~ ^${grep_pattern}$ ]]; then
+        final_source="$(dirname $final_source)/$file"
+        break
+      fi
+    done < <(ls -1 "$(dirname "$final_source")")
+  
+    if [[ -z "$final_source" ]]; then
+      log error "Failed to resolve local file wildcards"
+      return 1
+    fi
+    log info "Resolved wildcard local file: $final_source"
+  fi
+
   if [[ -d "$dest" ]]; then # If the provided dest is a directory
     log info "Destination $dest is a directory, constructing full destination path..."
     final_dest="$dest/$(basename $final_source)"
