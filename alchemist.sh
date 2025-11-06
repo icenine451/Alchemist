@@ -151,6 +151,8 @@ transmute() {
             ! -name "$(basename "$artifact_tar_file")" \
             ! -name "$(basename "$artifact_sha_file")" \
             -exec rm -rf {} +
+  else
+    log info "--dry-run detected, skipping artifact compression and $WORKDIR cleanup"
   fi
 
   log info "Finalization complete for $COMPONENT_NAME"
