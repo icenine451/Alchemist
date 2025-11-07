@@ -69,9 +69,12 @@ extract() {
     return 1
   fi
 
-  # Clean up archive after extraction
-  log info "Extraction successful, removing downloaded archive $archive"
-  rm "$archive"
+  if [[ ! "$DRYRUN" == "true" ]]; then
+    log info "Extraction successful, removing downloaded archive $archive"
+    rm "$archive"
+  else
+    log info "Extraction successful, skipping downloaded archive remove for dry-run"
+  fi
 
   log info "Archive $archive extracted successfully"
   echo "EXTRACTED_PATH=$final_dest"

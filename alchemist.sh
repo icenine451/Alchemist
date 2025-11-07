@@ -109,7 +109,7 @@ transmute() {
   done < <(echo $component_recipe_contents | jq -c --arg component_name "$COMPONENT_NAME" '.[$component_name].[]')
 
   # Artifact compression stage
-  if [[ ! "$dryrun" == "true" ]]; then
+  if [[ ! "$DRYRUN" == "true" ]]; then
     local final_artifact_dir="$REPO_ROOT/$COMPONENT_NAME/artifacts"
 
     if [[ ! -d "$final_artifact_dir" ]]; then
@@ -162,7 +162,7 @@ parse_args() {
   local recipe=""
   local alt_workdir=""
   local alt_versions=""
-  dryrun=""
+  DRYRUN=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -179,7 +179,7 @@ parse_args() {
         shift 2
         ;;
       --dry-run)
-        dryrun="true"
+        export DRYRUN="true"
         shift 1
         ;;
       *)
