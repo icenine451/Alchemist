@@ -19,7 +19,6 @@ source "$SCRIPT_DIR/lib/download.sh"
 source "$SCRIPT_DIR/lib/extract.sh"
 source "$SCRIPT_DIR/lib/assemble.sh"
 source "$SCRIPT_DIR/lib/libs.sh"
-source "$SCRIPT_DIR/lib/archive.sh"
 
 log() {
   echo "[$1] $2" >&2
@@ -34,7 +33,7 @@ transmute() {
   export EXTRACTED_PATH=""
 
   if [[ ! -e "$desired_versions" ]]; then
-    echo "Desired version file could not be found at $desired_versions, cannot continue."
+    log error "Desired version file could not be found at $desired_versions, cannot continue."
     exit 1
   fi
 

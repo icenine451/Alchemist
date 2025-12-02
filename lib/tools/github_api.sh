@@ -41,7 +41,7 @@ handle_github_rate_limit() {
       local wait_time=$((reset_time - current_time + 5))
 
       if [[ "$wait_time" -gt 0 ]]; then
-        echo "GitHub API rate limit hit. Waiting ${wait_time}s..."
+        log warn "GitHub API rate limit hit. Waiting ${wait_time}s..."
         sleep "$wait_time"
         return 0
       fi
@@ -57,19 +57,25 @@ handle_github_rate_limit() {
 get_latest_github_release_version() {
   local owner="$1"
   local repo="$2"
+  local GITHUB_TOKEN="${GITHUB_TOKEN:-}"
   local headers_file
   headers_file=$(mktemp)
 
   local api_url="https://api.github.com/repos/$owner/$repo/releases/latest"
   local response
-  response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
-  local curl_exit=$?
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    response=$(curl -sS -D "$headers_file" -H "Authorization: token $GITHUB_TOKEN" "$api_url" 2>&1)
+    local curl_exit=$?
+  else
+    response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
+    local curl_exit=$?
+  fi
 
   handle_github_rate_limit "$headers_file"
   rm -f "$headers_file"
 
   if [[ "$curl_exit" -ne 0 ]]; then
-    log_error "Failed to fetch latest release for $owner/$repo"
+    log error "Failed to fetch latest release for $owner/$repo"
     return 1
   fi
 
@@ -78,7 +84,7 @@ get_latest_github_release_version() {
   version=$(echo "$response" | jq -r '.tag_name')
 
   if [[ -z "$version" ]]; then
-    log_error "Could not parse latest version from GitHub API response"
+    log error "Could not parse latest version from GitHub API response"
     return 1
   fi
 
@@ -92,19 +98,25 @@ get_latest_github_release_version() {
 get_newest_github_release_version() {
   local owner="$1"
   local repo="$2"
+  local GITHUB_TOKEN="${GITHUB_TOKEN:-}"
   local headers_file
   headers_file=$(mktemp)
 
   local api_url="https://api.github.com/repos/$owner/$repo/releases"
   local response
-  response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
-  local curl_exit=$?
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    response=$(curl -sS -D "$headers_file" -H "Authorization: token $GITHUB_TOKEN" "$api_url" 2>&1)
+    local curl_exit=$?
+  else
+    response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
+    local curl_exit=$?
+  fi
 
   handle_github_rate_limit "$headers_file"
   rm -f "$headers_file"
 
   if [[ "$curl_exit" -ne 0 ]]; then
-    log_error "Failed to fetch newest release for $owner/$repo"
+    log error "Failed to fetch newest release for $owner/$repo"
     return 1
   fi
 
@@ -113,7 +125,7 @@ get_newest_github_release_version() {
   version=$(echo "$response" | jq -r 'sort_by(.published_at) | reverse | .[0].tag_name')
 
   if [[ -z "$version" ]]; then
-    log_error "Could not parse newest version from GitHub API response"
+    log error "Could not parse newest version from GitHub API response"
     return 1
   fi
 
@@ -129,19 +141,25 @@ get_github_release_asset_url() {
   local repo="$2"
   local version="$3"
   local pattern="$4"
+  local GITHUB_TOKEN="${GITHUB_TOKEN:-}"
   local headers_file
   headers_file=$(mktemp)
 
   local api_url="https://api.github.com/repos/$owner/$repo/releases/tags/$version"
   local response
-  response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
-  local curl_exit=$?
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    response=$(curl -sS -D "$headers_file" -H "Authorization: token $GITHUB_TOKEN" "$api_url" 2>&1)
+    local curl_exit=$?
+  else
+    response=$(curl -sS -D "$headers_file" "$api_url" 2>&1)
+    local curl_exit=$?
+  fi
 
   handle_github_rate_limit "$headers_file" # Make sure we aren't in GitHub API timeout
   rm -f "$headers_file"
 
   if [[ "$curl_exit" -ne 0 ]]; then
-    echo "Failed to fetch release $version for $owner/$repo"
+    log error "Failed to fetch release $version for $owner/$repo"
     return 1
   fi
 
@@ -164,7 +182,7 @@ get_github_release_asset_url() {
   done <<< "$assets"
 
   if [[ -z "$matched_url" ]]; then
-    echo "No asset matching pattern '$pattern' found in release $version"
+    log error "No asset matching pattern '$pattern' found in release $version"
     return 1
   fi
 
